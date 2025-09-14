@@ -1,0 +1,59 @@
+[
+  {
+    "name": "Rafat Alam",
+    "role": "",
+    "about": "Competative Programmer, sometimes showing skills in System Designing.",
+    "linkedin_url": "https://linkedin.com/in/rafatalam",
+    "github_url": "https://github.com/rafat-alam",
+    "image_url": "/team/rafat-alam.png"
+  },
+  {
+    "name": "Shubham Kumar",
+    "role": "",
+    "about": "UX specialist focused on creating intuitive interfaces for complex knowledge systems.",
+    "linkedin_url": "https://linkedin.com/in/shubhamkumar",
+    "github_url": "https://github.com/shubham-kumar",
+    "image_url": "/team/shubham-kumar.png"
+  },
+  
+  {
+    "name": "Sanskar Katiyar",
+    "role": "",
+    "about": "Full-stack developer with expertise in React and modern web technologies.",
+    "linkedin_url": "https://linkedin.com/in/sanskarkatiyar",
+    "github_url": "https://github.com/sanskar-katiyar",
+    "image_url": "/team/sanskar-katiyar.png"
+  },
+  {
+    "name": "Adarsh Gopalkrishna",
+    "role": "",
+    "about": "Machine learning specialist with a focus on large language models and RAG systems.",
+    "linkedin_url": "https://linkedin.com/in/adarshgopalkrishna",
+    "github_url": "https://github.com/adarsh-gopalkrishna",
+    "image_url": "/team/adarsh-gopalkrishna.png"
+  },
+  {
+    "name": "Anik Aryan",
+    "role": "",
+    "about": "Former educator with a passion for making knowledge accessible to everyone.",
+    "linkedin_url": "https://linkedin.com/in/anik-aryan",
+    "github_url": "https://github.com/anik-aryan",
+    "image_url": "/team/anik-aryan.png"
+  },
+  {
+    "name": "Yash Jindal",
+    "role": "",
+    "about": "Former curriculum designer helping to shape our educational content strategy.",
+    "linkedin_url": "https://linkedin.com/in/yashjindal",
+    "github_url": "https://github.com/yash-jindal",
+    "image_url": "/team/yash-jindal.png"
+  },
+   {
+    "name": "Radhe Shyam",
+    "role": "",
+    "about": "Former curriculum designer helping to shape our educational content strategy.",
+    "linkedin_url": "https://linkedin.com/in/radheshyam",
+    "github_url": "https://github.com/radhe-shyam",
+    "image_url": "/team/radhe-shyam.png"
+  }
+]
