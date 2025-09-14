@@ -21,23 +21,18 @@ export function NavMenu() {
         <NavigationMenu>
           <NavigationMenuList className="flex items-center space-x-4">
             <NavigationMenuItem>
-              <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                <Link href="/about">About</Link>
+              <NavigationMenuLink asChild>
+                <a href="/about" className={navigationMenuTriggerStyle()}>About</a>
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                <Link href="/mdx-public">MDX Public</Link>
+              <NavigationMenuLink asChild>
+                <a href="/mdx-public" className={navigationMenuTriggerStyle()}>MDX Public</a>
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                <Link href="/editor">MDX Editor</Link>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                {/* Hidden */}
+              <NavigationMenuLink asChild>
+                <a href="/editor" className={navigationMenuTriggerStyle()}>MDX Editor</a>
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
