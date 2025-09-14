@@ -32,12 +32,12 @@ export function NavMenu() {
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                <Link href="/mdx-public">MDX Public</Link>
+                <Link href="/editor">MDX Editor</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                <Link href="/mdx-public">MDX Public</Link>
+                {/* Hidden */}
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
