@@ -4,7 +4,7 @@ import Link from "next/link"
 export function SignUpButton() {
   return (
     <div className="flex flex-wrap items-center md:flex-row">
-      <Link href="/login">
+      <Link href="/signup">
         <Button variant={"outline"}><b>SignUp</b></Button>
       </Link>
     </div>

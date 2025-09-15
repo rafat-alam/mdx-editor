@@ -11,8 +11,13 @@ import {
 import { SignUpButton } from "./signup-button"
 import { SignInButton } from "./signin-button"
 import { ThemeButton } from "./theme-button"
+import { SignOutButton } from "./signout-button"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/app/api/auth/[...nextauth]/authoptions"
 
-export function NavMenu() {
+export async function NavMenu() {
+  const session = await getServerSession(authOptions);
+
   return (
     <div className="flex justify-between items-center w-full h-16 border-b border-border px-4">
       {/* Left side */}
@@ -42,8 +47,14 @@ export function NavMenu() {
       {/* Right side */}
       <div className="flex items-center space-x-3">
         <ThemeButton />
-        <SignUpButton />
-        <SignInButton />
+        {!session && (<SignUpButton />)}
+        {!session && (<SignInButton />)}
+        {session && (<>
+          <b>
+            {session.user.username}
+          </b>
+        </>)}
+        {session && (<SignOutButton />)}
       </div>
     </div>
   )
