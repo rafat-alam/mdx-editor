@@ -1,7 +1,7 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "root/db";
 import { users } from "root/db/schema";
-import { eq } from "drizzle-orm";
+import { ilike } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { AuthOptions } from "next-auth";
 
@@ -22,7 +22,7 @@ export const authOptions: AuthOptions = {
         const [user] = await db
           .select()
           .from(users)
-          .where(eq(users.email, credentials.email));
+          .where(ilike(users.email, credentials.email));
 
         if (!user) throw new Error("Invalid credentials");
 

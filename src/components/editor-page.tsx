@@ -3,7 +3,9 @@ import { MDXRenderer } from '@/components/mdx-renderer';
 import { useState, useEffect } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Maximize2, Minimize2 } from 'lucide-react';
+import { Maximize2, Minimize2 } from 'lucide-react';
+import { AskAI } from './ai-popup';
+import { Spinner } from './ui/shadcn-io/spinner';
 
 // Default content to show when no saved content exists
 const DEFAULT_CONTENT = '# Hello, MDX!\n\nThis is a sample MDX document.\n\n```js\nconsole.log("Hello world");\n```\n\n## Features\n\n- **Bold text** and *italic text*\n- Lists and code blocks\n- And more!';
@@ -14,6 +16,7 @@ export function EditorPage() {
   const [isPreviewFullscreen, setIsPreviewFullscreen] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
   const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
+  const [loading, setloading] = useState(false);
 
   // Check for mobile view and handle resize
   useEffect(() => {
@@ -126,6 +129,7 @@ export function EditorPage() {
       >
         <div className="p-3 h-14 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
           <h2 className="text-lg font-semibold">MDX Editor</h2>
+          <AskAI content={mdxContent} setcontent={setMdxContent} setloading={setloading}/>
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -138,14 +142,15 @@ export function EditorPage() {
             </Button>
           </div>
         </div>
-        <Textarea
-          className="w-full h-[calc(100%-3.5rem)] p-4 border-none rounded-none resize-none font-mono focus:ring-0 focus:outline-none text-base"
-          value={mdxContent}
-          onChange={handleContentChange}
-          style={{ fontSize: '1rem', lineHeight: '1.5' }}
-        />
-      </div>
-
+          {loading ? <div className='w-full h-[calc(100%-3.5rem)] bg-muted flex items-center justify-center'><Spinner /></div> : 
+            <Textarea
+              className="w-full h-[calc(100%-3.5rem)] p-4 border-none rounded-none resize-none font-mono focus:ring-0 focus:outline-none text-base"
+              value={mdxContent}
+              onChange={handleContentChange}
+              style={{ fontSize: '1rem', lineHeight: '1.5' }}
+            />
+          }
+        </div>
       {/* Preview Panel */}
       <div
         className={`${getPreviewWidth()} h-full overflow-auto transition-all duration-300 ${
@@ -155,21 +160,6 @@ export function EditorPage() {
         <div className="p-3 h-14 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
           <h2 className="text-lg font-semibold">Preview</h2>
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              asChild
-              className="h-8 p-1 flex items-center gap-1"
-            >
-              <a
-                href="/mdxPublic"
-                target="_blank"
-                className="flex items-center"
-              >
-                <span className="text-xs sm:text-sm">Public View</span>
-                <ExternalLink size={14} className="ml-1" />
-              </a>
-            </Button>
             <Button
               variant="ghost"
               size="sm"

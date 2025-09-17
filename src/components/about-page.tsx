@@ -12,9 +12,12 @@ import {
 } from 'lucide-react';
 import teamMembersData from '@/data/team_members_data.json';
 import Image from 'next/image';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/authoptions';
 
-export function AboutPage() {
-  const isAuthenticated = false;
+export async function AboutPage() {
+  const session = await getServerSession(authOptions);
+  
 
   return (
     <div className="flex flex-col min-h-screen w-full">
@@ -218,9 +221,9 @@ export function AboutPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            {!isAuthenticated && (
+            {!session && (
               <Button asChild size="lg" className="text-base px-8">
-                <a href="/signin">
+                <a href="/signup">
                   Sign Up Now
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </a>

@@ -1,3 +1,4 @@
+import { authOptions } from '@/app/api/auth/[...nextauth]/authoptions';
 import { Button } from '@/components/ui/button';
 import {
   Share2,
@@ -15,10 +16,10 @@ import {
   Save,
   Lightbulb
 } from 'lucide-react';
+import { getServerSession } from 'next-auth';
 
-export function HomePage() {
-
-  const isAuthenticated = false;
+export async function HomePage() {
+  const session = await getServerSession(authOptions);
 
   // Show the landing page for all users, whether authenticated or not
   return (
@@ -45,10 +46,10 @@ export function HomePage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                {isAuthenticated ? (
+                {session ? (
                   <>
                     <Button asChild size="lg" className="text-base px-8">
-                      <a href="/dashboard">Go to Dashboard</a>
+                      <a href={`/${session.user.username}`}>Go to Dashboard</a>
                     </Button>
                     <Button asChild variant="outline" size="lg" className="text-base">
                       <a href="/lesson-plan">Create Lesson Plan</a>
@@ -57,10 +58,10 @@ export function HomePage() {
                 ) : (
                   <>
                     <Button asChild size="lg" className="text-base px-8">
-                      <a href="/api/register">Get Started</a>
+                      <a href="/signup">Get Started</a>
                     </Button>
                     <Button asChild variant="outline" size="lg" className="text-base">
-                      <a href="/api/login">Sign In</a>
+                      <a href="/signin">Sign In</a>
                     </Button>
                   </>
                 )}
@@ -390,18 +391,18 @@ export function HomePage() {
       <section className="py-20 px-4 bg-gradient-to-br from-primary/10 to-background">
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            {isAuthenticated
+            {session
               ? "Continue Your Learning Journey"
               : "Ready to Create Your First Lesson Plan?"}
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            {isAuthenticated
+            {session
               ? "Create new lesson plans or explore content shared by the community."
               : "Join MDX Editor today and start creating structured, high-quality lesson plans with our powerful tools."}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {isAuthenticated ? (
+            {session ? (
               <>
                 <Button asChild size="lg" className="text-base px-8">
                   <a href="/lesson-plan">

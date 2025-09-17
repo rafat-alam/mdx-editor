@@ -49,11 +49,11 @@ export async function NavMenu() {
         <ThemeButton />
         {!session && (<SignUpButton />)}
         {!session && (<SignInButton />)}
-        {session && (<>
+        {session && (<a href={`/u/${session.user.username}`}>
           <b>
             {session.user.username}
           </b>
-        </>)}
+        </a>)}
         {session && (<SignOutButton />)}
       </div>
     </div>

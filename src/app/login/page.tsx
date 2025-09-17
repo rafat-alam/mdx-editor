@@ -1,8 +1,8 @@
 import { GalleryVerticalEnd } from "lucide-react"
 
-import { SignInForm } from "@/components/signin-form"
+import { LoginForm } from "@/components/login-form"
 
-export default function SignInPage() {
+export default function LoginPage() {
   return (
     <div className="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
@@ -12,7 +12,7 @@ export default function SignInPage() {
           </div>
           MDX Editor
         </a>
-        <SignInForm />
+        <LoginForm />
       </div>
     </div>
   )
