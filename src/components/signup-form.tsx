@@ -13,18 +13,19 @@ import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import axios, { AxiosError } from "axios"
+import { useDispatch } from "react-redux"
+import { AppDispatch } from "@/store/store"
+import { setToken } from "@/store/signUpSlice"
 
-export function LoginForm({
+export function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [otp, setOtp] = useState('');
-  const [step, setStep] = useState<'signup' | 'verify'>('signup');
-  const [token, settoken] = useState('');
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>()
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,40 +37,11 @@ export function LoginForm({
       });
 
       console.log('OTP sent to your email');
-      settoken(res.data.token);
-      setStep('verify');
+      dispatch(setToken(res.data.token));
+      router.push('/signup/verify')
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
       console.log(error.response?.data?.message || 'Signup failed');
-    }
-  };
-
-  const handleVerify = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await axios.post('/api/auth/verify-otp', {
-        token,
-        otp,
-      });
-
-      console.log('Account verified! You can now log in.');
-      router.push('/signin');
-    } catch (err) {
-      const error = err as AxiosError<{ message: string }>;
-      console.log(error.response?.data?.message || 'OTP verification failed');
-    }
-  };
-
-  const handleResend = async () => {
-    try {
-      const res = await axios.post('/api/auth/resend-otp', {
-        token
-      });
-      settoken(res.data.token);
-      console.log('OTP Resended');
-    } catch (err) {
-      const error = err as AxiosError<{ message: string }>;
-      console.log(error.response?.data?.message || 'OTP verification failed');
     }
   };
 
@@ -83,7 +55,7 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={(e) => handleSignup(e)}>
             <div className="grid gap-6">
               <div className="flex flex-col gap-4">
                 <Button variant="outline" className="w-full" disabled>
@@ -116,6 +88,8 @@ export function LoginForm({
                   <Input
                     id="email"
                     type="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
                     placeholder="m@example.com"
                     required
                   />
@@ -125,6 +99,8 @@ export function LoginForm({
                   <Input
                     id="username"
                     type="text"
+                    value={username}
+                    onChange={e => setUsername(e.target.value)}
                     placeholder="m1234"
                     required
                   />
@@ -133,7 +109,13 @@ export function LoginForm({
                   <div className="flex items-center">
                     <Label htmlFor="password">Password</Label>
                   </div>
-                  <Input id="password" type="password" required />
+                  <Input 
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    required
+                  />
                 </div>
                 <Button type="submit" className="w-full">
                   Login

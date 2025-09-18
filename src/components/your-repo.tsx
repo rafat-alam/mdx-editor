@@ -47,11 +47,8 @@ interface RepoInterface {
   isPublic: boolean;
 }
 
-export function Dashboard() {
+export function YourRepo() {
   const isRepoLoading = false;
-  const user = 'rafat';
-  const repoCount = 67;
-  const lastActive = null;
   const [searchQuery, setSearchQuery] = useState("");
   const [repos, setRepos] = useState<RepoInterface[]>([{
     id: "1",
@@ -132,93 +129,6 @@ export function Dashboard() {
 
   return (
     <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
-      <h1 className="text-2xl sm:text-3xl font-bold mb-2">{`Hi, ${user || 'User'}`}</h1>
-      <p className="text-muted-foreground mb-6 sm:mb-8 text-sm sm:text-base">
-        Welcome back, Here&apos;s an overview of your activity.
-      </p>
-
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-        <Card className="h-full bg-background">
-          <CardHeader className="pb-2 p-4 sm:p-6">
-            <CardTitle className="text-base sm:text-lg font-medium">Repositories</CardTitle>
-            <CardDescription className="text-xs sm:text-sm">Your saved Repositories</CardDescription>
-          </CardHeader>
-          <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
-            <div className="flex items-center">
-              <BookMarked className="h-6 w-6 sm:h-8 sm:w-8 text-primary mr-3" />
-              {isRepoLoading ? (
-                <Skeleton className="h-8 sm:h-10 w-16 sm:w-20" />
-              ) : (
-                <span className="text-2xl sm:text-3xl font-bold">{repoCount}</span>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="h-full bg-background">
-          <CardHeader className="pb-2 p-4 sm:p-6">
-            <CardTitle className="text-base sm:text-lg font-medium">Last Active</CardTitle>
-            <CardDescription className="text-xs sm:text-sm">Your previous session</CardDescription>
-          </CardHeader>
-          <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
-            <div className="flex items-center">
-              <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-primary mr-3" />
-              <span className="text-base sm:text-lg">
-                {lastActive ? formatDate(lastActive) : 'First Session'}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Quick Actions */}
-      <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Quick Actions</h2>
-      <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-        <Button asChild variant="outline" className="h-auto py-4 sm:py-6 justify-start">
-          <Link href="/editor" className="flex flex-col items-start">
-            <div className="flex items-center w-full">
-              <FileText className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-              <span className="font-medium text-sm sm:text-base">MDX Editor</span>
-              <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-auto" />
-            </div>
-            <span className="text-xs sm:text-sm text-muted-foreground mt-1">Create and edit MDX content</span>
-          </Link>
-        </Button>
-
-        <Button asChild variant="outline" className="h-auto py-4 sm:py-6 justify-start">
-          <Link href={`../r/${user}`} className="flex flex-col items-start">
-            <div className="flex items-center w-full">
-              <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-              <span className="font-medium text-sm sm:text-base">Your Repos...</span>
-              <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-auto" />
-            </div>
-            <span className="text-xs sm:text-sm text-muted-foreground mt-1">See your Repositories</span>
-          </Link>
-        </Button>
-
-        <Button asChild variant="outline" className="h-auto py-4 sm:py-6 justify-start">
-          <Link href="#" className="flex flex-col items-start">
-            <div className="flex items-center w-full">
-              <Globe className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-              <span className="font-medium text-sm sm:text-base">Public Repos...</span>
-              <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-auto" />
-            </div>
-            <span className="text-xs sm:text-sm text-muted-foreground mt-1">See Public Repositories</span>
-          </Link>
-        </Button>
-
-        <Button asChild variant="outline" className="h-auto py-4 sm:py-6 justify-start">
-          <Link href="#" className="flex flex-col items-start">
-            <div className="flex items-center w-full">
-              <Layers className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-              <span className="font-medium text-sm sm:text-base">Profile Settings</span>
-              <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-auto" />
-            </div>
-            <span className="text-xs sm:text-sm text-muted-foreground mt-1">Manage your account</span>
-          </Link>
-        </Button>
-      </div>
 
       {/* Saved Repositories */}
       <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Repositories</h2>
