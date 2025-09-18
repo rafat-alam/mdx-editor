@@ -78,10 +78,10 @@ export default function InputOTPForm() {
         token
       });
       dispatch(setToken(res.data.token));
-      toast.success('OTP Resended');
+      toast('OTP Resended');
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
-      toast.error(error.response?.data?.message || 'Something went wrong');
+      toast(error.response?.data?.message || 'Something went wrong');
     }
     setisSending(false);
   };

@@ -23,25 +23,9 @@ export async function NavMenu() {
       {/* Left side */}
       <div className="flex items-center space-x-4">
         <Link href="/" className="text-2xl font-semibold">MDX Editor</Link>
-        <NavigationMenu>
-          <NavigationMenuList className="flex items-center space-x-4">
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild>
-                <a href="/about" className={navigationMenuTriggerStyle()}>About</a>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild>
-                <a href="/mdx-public" className={navigationMenuTriggerStyle()}>MDX Public</a>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild>
-                <a href="/editor" className={navigationMenuTriggerStyle()}>MDX Editor</a>
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
+        <Link href="/about" className={navigationMenuTriggerStyle()}>About</Link>
+        <Link href="/mdx-public" className={navigationMenuTriggerStyle()}>MDX Public</Link>
+        <Link href="/editor" className={navigationMenuTriggerStyle()}>MDX Editor</Link>
       </div>
 
       {/* Right side */}

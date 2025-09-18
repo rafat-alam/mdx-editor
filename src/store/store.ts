@@ -3,7 +3,7 @@ import signupReducer from './signUpSlice'
 
 export const store = configureStore({
   reducer: {
-    signuptoken: signupReducer,
+    signup: signupReducer,
   },
 })
 

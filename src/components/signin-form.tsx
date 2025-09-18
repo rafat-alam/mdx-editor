@@ -12,6 +12,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { signIn } from "next-auth/react"
+import { useDispatch } from "react-redux"
+import { AppDispatch } from "@/store/store"
+import { setLoading3 } from "@/store/signUpSlice"
+import { toast } from "sonner"
 
 export function SignInForm({
   className,
@@ -19,9 +23,11 @@ export function SignInForm({
 }: React.ComponentProps<"div">) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const dispatch = useDispatch<AppDispatch>()
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    dispatch(setLoading3(true));
     const res = await signIn('credentials', {
       email,
       password,
@@ -29,9 +35,11 @@ export function SignInForm({
     });
 
     if (res?.ok) {
+      toast.success("Welcome!");
       window.location.href = '/';
     } else {
-      console.log(res?.error || 'Signin failed');
+      dispatch(setLoading3(false));
+      toast.error(res?.error || 'Signin failed!');
     }
   };
 
@@ -41,7 +49,7 @@ export function SignInForm({
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>
           <CardDescription>
-            Login with your Apple or Google account
+            SignIn with your Apple or Google account
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -55,7 +63,7 @@ export function SignInForm({
                       fill="currentColor"
                     />
                   </svg>
-                  Login with Apple
+                  SignIn with Apple
                 </Button>
                 <Button variant="outline" className="w-full" disabled>
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -64,7 +72,7 @@ export function SignInForm({
                       fill="currentColor"
                     />
                   </svg>
-                  Login with Google
+                  SignIn with Google
                 </Button>
               </div>
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
@@ -78,7 +86,7 @@ export function SignInForm({
                   <Input
                     id="email"
                     type="email"
-                    placeholder="m@example.com"
+                    placeholder="user@email.com"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     required
@@ -88,7 +96,7 @@ export function SignInForm({
                   <div className="flex items-center">
                     <Label htmlFor="password">Password</Label>
                     <a
-                      href="#"
+                      href="/forgot-pass"
                       className="ml-auto text-sm underline-offset-4 hover:underline"
                     >
                       Forgot your password?
@@ -103,13 +111,13 @@ export function SignInForm({
                   />
                 </div>
                 <Button type="submit" className="w-full">
-                  Login
+                  SignIn
                 </Button>
               </div>
               <div className="text-center text-sm">
                 Don&apos;t have an account?{" "}
-                <a href="#" className="underline underline-offset-4">
-                  Sign up
+                <a href="/signup" className="underline underline-offset-4">
+                  SignUp
                 </a>
               </div>
             </div>

@@ -10,12 +10,13 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import {  useEffect, useState } from "react"
+import { redirect, usePathname, useRouter } from "next/navigation"
 import axios, { AxiosError } from "axios"
 import { useDispatch } from "react-redux"
 import { AppDispatch } from "@/store/store"
-import { setToken } from "@/store/signUpSlice"
+import { setLoading, setToken } from "@/store/signUpSlice"
+import { toast } from "sonner"
 
 export function SignUpForm({
   className,
@@ -29,6 +30,7 @@ export function SignUpForm({
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    dispatch(setLoading(true));
     try {
       const res = await axios.post('/api/auth/signup', {
         email,
@@ -36,12 +38,13 @@ export function SignUpForm({
         password,
       });
 
-      console.log('OTP sent to your email');
       dispatch(setToken(res.data.token));
+      toast.success(res?.data?.message || 'Something went wrong!');
       router.push('/signup/verify')
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
-      console.log(error.response?.data?.message || 'Signup failed');
+      dispatch(setLoading(false));
+      toast.error(error.response?.data?.message || 'Signup failed');
     }
   };
 
@@ -65,7 +68,7 @@ export function SignUpForm({
                       fill="currentColor"
                     />
                   </svg>
-                  Login with Apple
+                  SignUp with Apple
                 </Button>
                 <Button variant="outline" className="w-full" disabled>
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -74,7 +77,7 @@ export function SignUpForm({
                       fill="currentColor"
                     />
                   </svg>
-                  Login with Google
+                  SignUp with Google
                 </Button>
               </div>
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
@@ -90,7 +93,7 @@ export function SignUpForm({
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
-                    placeholder="m@example.com"
+                    placeholder="user@email.com"
                     required
                   />
                 </div>
@@ -101,7 +104,7 @@ export function SignUpForm({
                     type="text"
                     value={username}
                     onChange={e => setUsername(e.target.value)}
-                    placeholder="m1234"
+                    placeholder="user123"
                     required
                   />
                 </div>
@@ -118,13 +121,13 @@ export function SignUpForm({
                   />
                 </div>
                 <Button type="submit" className="w-full">
-                  Login
+                  SignUp
                 </Button>
               </div>
               <div className="text-center text-sm">
                 Have an an account?{" "}
                 <a href="/signin" className="underline underline-offset-4">
-                  Sign In
+                  SignIn
                 </a>
               </div>
             </div>
