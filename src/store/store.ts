@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit'
-import signupReducer from './signUpSlice'
+import authReducer from './authSlice'
 
 export const store = configureStore({
   reducer: {
-    signup: signupReducer,
+    auth: authReducer,
   },
 })
 

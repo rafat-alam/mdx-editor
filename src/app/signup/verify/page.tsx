@@ -23,7 +23,7 @@ import { usePathname, useRouter } from "next/navigation"
 import axios, { AxiosError } from "axios"
 import { useDispatch, useSelector } from "react-redux"
 import { AppDispatch, RootState } from "@/store/store"
-import { setLoading, setLoading2, setToken } from "@/store/signUpSlice"
+import { setLoading, setLoading2, setToken } from "@/store/authSlice"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
@@ -44,8 +44,8 @@ export default function InputOTPForm() {
 
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>()
-  const token = useSelector((state: RootState) => state.signup.token);
-  const loading2 = useSelector((state: RootState) => state.signup.loading2);
+  const token = useSelector((state: RootState) => state.auth.token);
+  const loading2 = useSelector((state: RootState) => state.auth.loading2);
   const [isSending, setisSending] = useState(false);
   const pathname = usePathname();
 
@@ -62,12 +62,12 @@ export default function InputOTPForm() {
         otp: data.pin,
       });
 
-      toast(res?.data?.message || 'Something went wrong!');
+      toast.success(res?.data?.message || 'Something went wrong!');
       router.push('/signin');
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
+      toast.error(error.response?.data?.message || 'OTP verification failed');
       dispatch(setLoading2(false));
-      toast(error.response?.data?.message || 'OTP verification failed');
     }
   }
 

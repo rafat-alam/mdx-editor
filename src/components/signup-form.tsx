@@ -7,15 +7,15 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui2/card"
+import { Input } from "@/components/ui2/input"
 import { Label } from "@/components/ui/label"
-import {  useEffect, useState } from "react"
-import { redirect, usePathname, useRouter } from "next/navigation"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import axios, { AxiosError } from "axios"
 import { useDispatch } from "react-redux"
 import { AppDispatch } from "@/store/store"
-import { setLoading, setToken } from "@/store/signUpSlice"
+import { setLoading, setToken } from "@/store/authSlice"
 import { toast } from "sonner"
 
 export function SignUpForm({
@@ -43,14 +43,14 @@ export function SignUpForm({
       router.push('/signup/verify')
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
-      dispatch(setLoading(false));
       toast.error(error.response?.data?.message || 'Signup failed');
+      dispatch(setLoading(false));
     }
   };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
+      <Card className="bg-background">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Hi, there </CardTitle>
           <CardDescription>
@@ -81,7 +81,7 @@ export function SignUpForm({
                 </Button>
               </div>
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-                <span className="bg-card text-muted-foreground relative z-10 px-2">
+                <span className="bg-background text-muted-foreground relative z-10 px-2">
                   Or continue with
                 </span>
               </div>

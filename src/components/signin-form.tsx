@@ -7,14 +7,14 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui2/card"
+import { Input } from "@/components/ui2/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { useDispatch } from "react-redux"
 import { AppDispatch } from "@/store/store"
-import { setLoading3 } from "@/store/signUpSlice"
+import { setLoading3 } from "@/store/authSlice"
 import { toast } from "sonner"
 
 export function SignInForm({
@@ -45,7 +45,7 @@ export function SignInForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
+      <Card className="bg-background">
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>
           <CardDescription>
@@ -76,7 +76,7 @@ export function SignInForm({
                 </Button>
               </div>
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-                <span className="bg-card text-muted-foreground relative z-10 px-2">
+                <span className="bg-background text-muted-foreground relative z-10 px-2">
                   Or continue with
                 </span>
               </div>

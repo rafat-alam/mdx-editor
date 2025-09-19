@@ -1,6 +1,6 @@
 'use client'
 
-import { z } from 'zod'
+import { email, z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -22,7 +22,13 @@ import {
   CardTitle,
 } from '@/components/ui2/card'
 import { Input } from '@/components/ui2/input'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import axios, { AxiosError } from 'axios'
+import { useDispatch, useSelector } from 'react-redux'
+import { setForgotToken, setLoading4 } from '@/store/authSlice'
+import { RootState } from '@/store/store'
+import { useEffect } from 'react'
+import { Loader2 } from 'lucide-react'
 
 // Inline schema for email validation
 const formSchema = z.object({
@@ -38,22 +44,34 @@ export default function ForgetPassword() {
   })
 
   const router = useRouter();
+  const dispatch = useDispatch();
+  const loading4 = useSelector((state: RootState) => state.auth.loading4);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    dispatch(setLoading4(false));
+  }, [pathname])
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    dispatch(setLoading4(true));
     try {
-      // Assuming a function to send reset email
-      console.log(values)
-      toast.success('Password reset email sent. Please check your inbox.')
-      router.push('/forgot-pass/verify')
-    } catch (error) {
-      console.error('Error sending password reset email', error)
-      toast.error('Failed to send password reset email. Please try again.')
+      const res = await axios.post('/api/auth/forgot-pass/send-otp', {
+        email: values.email,
+      });
+
+      dispatch(setForgotToken(res.data.token));
+      toast(res?.data?.message || 'Something went wrong!');
+      router.push('/forgot-pass/verify');
+    } catch (err) {
+      const error = err as AxiosError<{ message: string }>;
+      toast(error.response?.data?.message || 'OTP verification failed');
+      dispatch(setLoading4(false));
     }
   }
 
   return (
     <div className="flex h-[calc(100vh-4rem)] w-full items-center justify-center px-4">
-      <Card className="mx-auto max-w-sm bg-background">
+      {!loading4 ? <Card className="mx-auto max-w-sm bg-background">
         <CardHeader>
           <CardTitle className="text-2xl">Forgot Password</CardTitle>
           <CardDescription>
@@ -91,7 +109,8 @@ export default function ForgetPassword() {
             </form>
           </Form>
         </CardContent>
-      </Card>
+      </Card> :
+      <Loader2 className="h-8 w-8 sm:h-10 sm:w-10 mr-2 animate-spin" />}
     </div>
   )
 }

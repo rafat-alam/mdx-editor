@@ -23,7 +23,7 @@ import { usePathname, useRouter } from "next/navigation"
 import axios, { AxiosError } from "axios"
 import { useDispatch, useSelector } from "react-redux"
 import { AppDispatch, RootState } from "@/store/store"
-import { setLoading, setLoading2, setToken } from "@/store/signUpSlice"
+import { setForgotToken2, setLoading, setLoading2, setLoading5, setToken } from "@/store/authSlice"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
@@ -44,44 +44,44 @@ export default function InputOTPForm() {
 
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>()
-  const token = useSelector((state: RootState) => state.signup.token);
-  const loading2 = useSelector((state: RootState) => state.signup.loading2);
+  const token = useSelector((state: RootState) => state.auth.forgottoken);
+  const loading5 = useSelector((state: RootState) => state.auth.loading5);
   const [isSending, setisSending] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
-    dispatch(setLoading2(false));
+    dispatch(setLoading5(false));
   }, [pathname])
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    dispatch(setLoading2(true));
+    dispatch(setLoading5(true));
     try {
-      console.log(token)
-      const res = await axios.post('/api/auth/verify-otp', {
+      const res = await axios.post('/api/auth/forgot-pass/verify-otp', {
         token,
         otp: data.pin,
       });
 
-      toast(res?.data?.message || 'Something went wrong!');
-      router.push('/signin');
+      dispatch(setForgotToken2(res.data.token));
+      toast.success(res?.data?.message || 'Something went wrong!');
+      router.push('/forgot-pass/change-pass');
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
-      dispatch(setLoading2(false));
-      toast(error.response?.data?.message || 'OTP verification failed');
+      toast.error(error.response?.data?.message || 'Something went wrong!');
+      dispatch(setLoading5(false));
     }
   }
 
   const handleResend = async () => {
     setisSending(true);
     try {
-      const res = await axios.post('/api/auth/resend-otp', {
+      const res = await axios.post('/api/auth/forgot-pass/resend-otp', {
         token
       });
-      dispatch(setToken(res.data.token));
-      toast('OTP Resended');
+      dispatch(setForgotToken2(res.data.token));
+      toast.success(res?.data?.message || 'Something went wrong!');
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
-      toast(error.response?.data?.message || 'Something went wrong');
+      toast.error(error.response?.data?.message || 'Something went wrong!');
     }
     setisSending(false);
   };
@@ -89,7 +89,7 @@ export default function InputOTPForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full h-[calc(100vh-4rem)] flex flex-col items-center justify-center space-y-6">
-        {!loading2 ? <><FormField
+        {!loading5 ? <><FormField
           control={form.control}
           name="pin"
           render={({ field }) => (
@@ -116,6 +116,7 @@ export default function InputOTPForm() {
         />
         <div className="flex gap-5">
           <Button
+            type="button"
             variant="destructive"
             onClick={handleResend}
             disabled={isSending}
