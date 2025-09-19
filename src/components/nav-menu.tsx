@@ -20,12 +20,13 @@ export async function NavMenu() {
 
   return (
     <div className="flex justify-between items-center w-full h-16 border-b border-border px-4">
+      {/* eslint-disable @next/next/no-html-link-for-pages */}
       {/* Left side */}
       <div className="flex items-center space-x-4">
-        <Link href="/" className="text-2xl font-semibold">MDX Editor</Link>
-        <Link href="/about" className={navigationMenuTriggerStyle()}>About</Link>
-        <Link href="/mdx-public" className={navigationMenuTriggerStyle()}>MDX Public</Link>
-        <Link href="/editor" className={navigationMenuTriggerStyle()}>MDX Editor</Link>
+        <a href="/" className="text-2xl font-semibold">MDX Editor</a>
+        <a href="/about" className={navigationMenuTriggerStyle()}>About</a>
+        <a href="/mdx-public" className={navigationMenuTriggerStyle()}>MDX Public</a>
+        {session && <a href="/editor" className={navigationMenuTriggerStyle()}>MDX Editor</a>}
       </div>
 
       {/* Right side */}
@@ -40,6 +41,7 @@ export async function NavMenu() {
         </a>)}
         {session && (<SignOutButton />)}
       </div>
+      {/* eslint-enable @next/next/no-html-link-for-pages */}
     </div>
   )
 }
