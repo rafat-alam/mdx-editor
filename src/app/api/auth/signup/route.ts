@@ -11,7 +11,8 @@ export const POST = async (req: NextRequest) => {
   try {
     // Step 1: Parse request body
     const body = await req.json()
-    let { email, username, password } = body
+    let { email, username } = body
+    const password = body.password
 
     if (!email || !username || !password) {
       return NextResponse.json({ message: 'Missing fields' }, { status: 400 })
