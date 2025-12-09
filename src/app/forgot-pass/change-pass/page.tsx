@@ -30,10 +30,10 @@ import { useEffect } from 'react'
 import { setLoading4, setLoading6 } from '@/store/authSlice'
 import { Loader2 } from 'lucide-react'
 
-// 🔹 Inline Zod schema
+// Inline Zod schema
 const formSchema = z
   .object({
-    password: z.string().min(6, 'Password must be at least 6 characters'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -65,7 +65,7 @@ export default function ResetPasswordPreview() {
     try {
       const res = await axios.post('/api/auth/forgot-pass/set-pass', {
         token,
-        newPassword: values.confirmPassword,
+        newPassword: values.confirmPassword.trim(),
       });
 
       toast(res?.data?.message || 'Something went wrong!');
@@ -103,6 +103,16 @@ export default function ResetPasswordPreview() {
                           id="password"
                           placeholder="******"
                           autoComplete="new-password"
+                          required
+                          pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$"
+                          onInvalid={(e) =>
+                            (e.target as HTMLInputElement).setCustomValidity(
+                              "Password must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 special character."
+                            )
+                          }
+                          onInput={(e) =>
+                            (e.target as HTMLInputElement).setCustomValidity("")
+                          }
                           {...field}
                         />
                       </FormControl>
@@ -126,6 +136,16 @@ export default function ResetPasswordPreview() {
                           id="confirmPassword"
                           placeholder="******"
                           autoComplete="new-password"
+                          required
+                          pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$"
+                          onInvalid={(e) =>
+                            (e.target as HTMLInputElement).setCustomValidity(
+                              "Password must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 special character."
+                            )
+                          }
+                          onInput={(e) =>
+                            (e.target as HTMLInputElement).setCustomValidity("")
+                          }
                           {...field}
                         />
                       </FormControl>

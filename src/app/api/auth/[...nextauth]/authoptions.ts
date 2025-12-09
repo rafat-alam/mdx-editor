@@ -12,30 +12,48 @@ export const authOptions: AuthOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "text" },
+        email_username: { label: "Email-Username", type: "text" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials) return null;
 
         // Fetch user from Postgres
-        const [user] = await db
+        const [user1] = await db
           .select()
           .from(users)
-          .where(ilike(users.email, credentials.email));
+          .where(ilike(users.email, credentials.email_username.trim().toLowerCase()));
 
-        if (!user) throw new Error("Invalid credentials");
+        const [user2] = await db
+          .select()
+          .from(users)
+          .where(ilike(users.username, credentials.email_username.trim().toLowerCase()));
 
-        // Verify password
-        const isValid = await bcrypt.compare(credentials.password, user.password);
-        if (!isValid) throw new Error("Invalid credentials");
+        if (!user1 && !user2) throw new Error("Invalid credentials");
 
-        // Return user info for JWT/session
-        return {
-          id: user.id.toString(),
-          email: user.email,
-          username: user.username,
-        };
+        if(user1) {
+          // Verify password
+          const isValid = await bcrypt.compare(credentials.password, user1.password);
+          if (!isValid) throw new Error("Invalid credentials");
+
+          // Return user info for JWT/session
+          return {
+            id: user1.id.toString(),
+            email: user1.email,
+            username: user1.username,
+          };
+        } else {
+          // Verify password
+          const isValid = await bcrypt.compare(credentials.password, user2.password);
+          if (!isValid) throw new Error("Invalid credentials");
+
+          // Return user info for JWT/session
+          return {
+            id: user2.id.toString(),
+            email: user2.email,
+            username: user2.username,
+          };
+        }
       },
     }),
   ],

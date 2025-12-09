@@ -30,7 +30,7 @@ import { Loader2 } from "lucide-react"
 
 const FormSchema = z.object({
   pin: z.string().min(6, {
-    message: "Your one-time password must be 6 characters.",
+    message: "Your one-time password must be of 6 digits.",
   }),
 })
 

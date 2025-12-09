@@ -7,14 +7,16 @@ import { sendEmail } from "root/helpers/mailer";
 import crypto from "crypto";
 
 export async function POST(req: NextRequest) {
-  const { email } = await req.json();
+  let { email } = await req.json();
+
+  email = email.trim().toLowerCase();
+  
   if (!email) return NextResponse.json({ message: "Email required" }, { status: 400 });
 
   // Check if user exists
   const [user] = await db.select().from(users).where(eq(users.email, email.toLowerCase()));
   if (!user) {
-    // to avoid user enumeration you may still return success here
-    return NextResponse.json({ message: "OTP Sent" }, { status: 201 });
+    return NextResponse.json({ message: "User not registered." }, { status: 400 });
   }
 
   // Generate OTP and expiry

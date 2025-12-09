@@ -33,9 +33,9 @@ export function SignUpForm({
     dispatch(setLoading(true));
     try {
       const res = await axios.post('/api/auth/signup', {
-        email,
-        username,
-        password,
+        email: email.trim().toLowerCase(),
+        username: username.trim().toLowerCase(),
+        password: password.trim(),
       });
 
       dispatch(setToken(res.data.token));
@@ -95,6 +95,15 @@ export function SignUpForm({
                     onChange={e => setEmail(e.target.value)}
                     placeholder="user@email.com"
                     required
+                    pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                    onInvalid={(e) =>
+                      (e.target as HTMLInputElement).setCustomValidity(
+                        "Enter a valid email"
+                      )
+                    }
+                    onInput={(e) =>
+                      (e.target as HTMLInputElement).setCustomValidity("")
+                    }
                   />
                 </div>
                 <div className="grid gap-3">
@@ -106,6 +115,15 @@ export function SignUpForm({
                     onChange={e => setUsername(e.target.value)}
                     placeholder="user123"
                     required
+                    pattern="^[a-z0-9]{5,}$"
+                    onInvalid={(e) =>
+                      (e.target as HTMLInputElement).setCustomValidity(
+                        "At least 5 characters and only use [a-z, 0-9]"
+                      )
+                    }
+                    onInput={(e) =>
+                      (e.target as HTMLInputElement).setCustomValidity("")
+                    }
                   />
                 </div>
                 <div className="grid gap-3">
@@ -118,6 +136,15 @@ export function SignUpForm({
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     required
+                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$"
+                    onInvalid={(e) =>
+                      (e.target as HTMLInputElement).setCustomValidity(
+                        "Password must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 special character."
+                      )
+                    }
+                    onInput={(e) =>
+                      (e.target as HTMLInputElement).setCustomValidity("")
+                    }
                   />
                 </div>
                 <Button type="submit" className="w-full">
@@ -125,7 +152,7 @@ export function SignUpForm({
                 </Button>
               </div>
               <div className="text-center text-sm">
-                Have an an account?{" "}
+                Have an account?{" "}
                 <a href="/signin" className="underline underline-offset-4">
                   SignIn
                 </a>

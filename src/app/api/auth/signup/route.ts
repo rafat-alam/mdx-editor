@@ -11,10 +11,19 @@ export const POST = async (req: NextRequest) => {
   try {
     // Step 1: Parse request body
     const body = await req.json()
-    const { email, username, password } = body
+    let { email, username, password } = body
 
     if (!email || !username || !password) {
       return NextResponse.json({ message: 'Missing fields' }, { status: 400 })
+    }
+
+    email = email.trim().toLowerCase();
+    username = username.trim().toLowerCase();
+
+    const usernameRegex = /^[a-z0-9]{5,}$/;
+
+    if (!usernameRegex.test(username)) {
+      return NextResponse.json({ message: 'Username is not in valid format' }, { status: 400 });
     }
 
     // Step 2: Check if email already exists

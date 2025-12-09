@@ -21,7 +21,7 @@ export function SignInForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [email, setEmail] = useState('');
+  const [email_username, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch<AppDispatch>()
   
@@ -29,8 +29,8 @@ export function SignInForm({
     e.preventDefault();
     dispatch(setLoading3(true));
     const res = await signIn('credentials', {
-      email,
-      password,
+      email_username: email_username.trim().toLowerCase(),
+      password: password.trim(),
       redirect: false,
     });
 
@@ -82,12 +82,12 @@ export function SignInForm({
               </div>
               <div className="grid gap-6">
                 <div className="grid gap-3">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">Email / Username</Label>
                   <Input
                     id="email"
-                    type="email"
-                    placeholder="user@email.com"
-                    value={email}
+                    type="text"
+                    placeholder="user@email.com or user"
+                    value={email_username}
                     onChange={e => setEmail(e.target.value)}
                     required
                   />
@@ -108,6 +108,15 @@ export function SignInForm({
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     required
+                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$"
+                    onInvalid={(e) =>
+                      (e.target as HTMLInputElement).setCustomValidity(
+                        "Password must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 special character."
+                      )
+                    }
+                    onInput={(e) =>
+                      (e.target as HTMLInputElement).setCustomValidity("")
+                    }
                   />
                 </div>
                 <Button type="submit" className="w-full">

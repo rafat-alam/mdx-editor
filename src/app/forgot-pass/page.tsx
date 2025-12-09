@@ -56,7 +56,7 @@ export default function ForgetPassword() {
     dispatch(setLoading4(true));
     try {
       const res = await axios.post('/api/auth/forgot-pass/send-otp', {
-        email: values.email,
+        email: values.email.trim().toLowerCase(),
       });
 
       dispatch(setForgotToken(res.data.token));
