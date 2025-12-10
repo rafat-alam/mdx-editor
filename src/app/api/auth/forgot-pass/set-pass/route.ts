@@ -28,6 +28,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "OTP not verified" }, { status: 403 });
   }
 
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+
+  if (!passwordRegex.test(newPassword)) {
+    return NextResponse.json({ message: 'Password is not in valid format' }, { status: 400 });
+  }
+
   // Hash and update password
   const hashed = await bcrypt.hash(newPassword, 10);
   const updated = await db

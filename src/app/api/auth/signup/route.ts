@@ -27,6 +27,12 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ message: 'Username is not in valid format' }, { status: 400 });
     }
 
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+      return NextResponse.json({ message: 'Password is not in valid format' }, { status: 400 });
+    }
+
     // Step 2: Check if email already exists
     const [existingUserByEmail] = await db
       .select()
