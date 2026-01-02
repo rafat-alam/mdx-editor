@@ -1,12 +1,13 @@
 import CredentialsProvider from "next-auth/providers/credentials";
-import { db } from "root/db";
-import { users } from "root/db/schema";
-import { ilike } from "drizzle-orm";
-import bcrypt from "bcryptjs";
+import { getDB } from "root/db";
+import { user } from "root/db/schema";
+import { eq, or } from "drizzle-orm";
 import { AuthOptions } from "next-auth";
+import { HelperService } from "@/module/services/helper_service";
+import type { User } from "next-auth";
 
 export const authOptions: AuthOptions = {
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET ?? 'rafat',
   session: { strategy: "jwt" },
   providers: [
     CredentialsProvider({
@@ -15,62 +16,46 @@ export const authOptions: AuthOptions = {
         email_username: { label: "Email-Username", type: "text" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials): Promise<User | null> {
         if (!credentials) return null;
 
-        // Fetch user from Postgres
-        const [user1] = await db
-          .select()
-          .from(users)
-          .where(ilike(users.email, credentials.email_username.trim().toLowerCase()));
+        const db = await getDB();
+        const identifier = credentials.email_username.trim().toLowerCase();
 
-        const [user2] = await db
-          .select()
-          .from(users)
-          .where(ilike(users.username, credentials.email_username.trim().toLowerCase()));
+        const [db_user] = await db.select().from(user).where(or(eq(user.email, identifier), eq(user.username, identifier)));
 
-        if (!user1 && !user2) throw new Error("Invalid credentials");
+        if (!db_user) throw new Error("Invalid credentials");
 
-        if(user1) {
-          // Verify password
-          const isValid = await bcrypt.compare(credentials.password, user1.password);
-          if (!isValid) throw new Error("Invalid credentials");
+        const is_valid = HelperService.verify(credentials.password, db_user.password_hash);
 
-          // Return user info for JWT/session
-          return {
-            id: user1.id.toString(),
-            email: user1.email,
-            username: user1.username,
-          };
-        } else {
-          // Verify password
-          const isValid = await bcrypt.compare(credentials.password, user2.password);
-          if (!isValid) throw new Error("Invalid credentials");
+        if (!is_valid) throw new Error("Invalid credentials");
 
-          // Return user info for JWT/session
-          return {
-            id: user2.id.toString(),
-            email: user2.email,
-            username: user2.username,
-          };
-        }
+        return {
+          id: db_user.user_id,
+          user_id: db_user.user_id,
+          username: db_user.username,
+          name: db_user.name,
+          email: db_user.email,
+        };
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.email = user.email;
+        token.user_id = user.user_id;
         token.username = user.username;
+        token.name = user.name;
+        token.email = user.email;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string;
-        session.user.email = token.email as string;
+        session.user.user_id = token.user_id as string;
         session.user.username = token.username as string;
+        session.user.name = token.name as string;
+        session.user.email = token.email as string;
       }
       return session;
     },

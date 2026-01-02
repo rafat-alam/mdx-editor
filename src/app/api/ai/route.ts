@@ -27,6 +27,6 @@ export async function POST(req: NextRequest) {
       response: result.response.candidates?.[0]?.content?.parts?.[0]?.text,
     }, { status: 200 });
   } catch {
-    return NextResponse.json({ error: "something went wrong" }, { status: 500 });
+    return NextResponse.json({ message: 'INTERNAL SERVER ERROR!' }, { status: 500 });
   }
 }

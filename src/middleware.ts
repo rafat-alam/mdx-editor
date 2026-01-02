@@ -8,19 +8,19 @@ export function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  const protectedPaths1 = [
-    '/api/ai',
-    '/editor'
+  const protectedPaths1: any = [
+    // '/api/ai',
+    // '/editor'
   ];
 
-  const protectedPaths2 = [
-    '/signup',
-    '/signin',
-    '/forgot-pass',
+  const protectedPaths2: any = [
+    // '/signup',
+    // '/signin',
+    // '/forgot-pass',
   ];
 
-  const isProtected1 = protectedPaths1.some((path) => pathname.startsWith(path));
-  const isProtected2 = protectedPaths2.some((path) => pathname.startsWith(path));
+  const isProtected1 = protectedPaths1.some((path: any) => pathname.startsWith(path));
+  const isProtected2 = protectedPaths2.some((path: any) => pathname.startsWith(path));
   if (isProtected1 && !token) {
     return NextResponse.redirect(new URL('/signin', request.url));
   }
