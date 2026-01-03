@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'User not authenticated!' }, { status: 500 });
     }
 
-    const res: Response = await AuthService.set_mail(token, jwt_token.email);
+    const res: Response = await AuthService.set_email(token, jwt_token.email);
 
     return NextResponse.json({ message: res.message }, { status: res.status });
   } catch {

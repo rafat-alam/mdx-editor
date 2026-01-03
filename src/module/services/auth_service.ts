@@ -152,7 +152,7 @@ export class AuthService {
     }
   }
 
-  static async forgot_pass_resend_otp(token: string): Promise<Response> {
+  static async forgot_pass_or_change_email_resend_otp(token: string): Promise<Response> {
     try {
       const secret: string = process.env.JWT_SECRET ?? 'rafat';
 
@@ -182,7 +182,7 @@ export class AuthService {
     }
   }
 
-  static async forgot_pass_verify_otp(token: string, otp: string): Promise<Response> {
+  static async forgot_pass_or_change_email_verify_otp(token: string, otp: string): Promise<Response> {
     try {
       const secret: string = process.env.JWT_SECRET ?? 'rafat';
 
@@ -239,7 +239,30 @@ export class AuthService {
     }
   }
 
-  static async set_mail(token: string, email: string): Promise<Response> {
+  static async init_change_email(email: string): Promise<Response> {
+    try {
+      if (await UserRepo.find_by_email(email)) {
+        return { status: 400, message: 'E-Mail already used!' };
+      }
+
+      const otp = randomInt(100000, 999999).toString();
+      const otp_expiry = Date.now() + 10 * 60 * 1000;
+
+      // send OTP here (email/sms)
+      console.log(otp);
+
+      const payload = { email, otp, otp_expiry, can_reset: false };
+
+      const secret: string = process.env.JWT_SECRET ?? 'rafat';
+      const token = sign(payload, secret, { expiresIn: '15m' });
+
+      return { status: 200, message: token };
+    } catch {
+      return { status: 500, message: iserror };
+    }
+  }
+
+  static async set_email(token: string, email: string): Promise<Response> {
     try {
       const secret: string = process.env.JWT_SECRET ?? 'rafat';
 
@@ -254,8 +277,8 @@ export class AuthService {
         return { status: 500, message: 'OTP not verified' };
       }
 
-      if ((await UserRepo.find_by_email(email)) == false) {
-        return { status: 500, message: 'User not found!' };
+      if (await UserRepo.find_by_email(decoded.email)) {
+        return { status: 500, message: 'E-Mail already used!' };
       }
 
       await UserRepo.update_mail(email, decoded.email);
