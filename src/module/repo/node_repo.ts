@@ -109,4 +109,12 @@ export class NodeRepo {
     const db = await getDB();
     await db.update(dir).set({ last_updated : new Date() }).where(eq(dir.node_id, node_id));
   }
+
+  static async get_all_public_repo(): Promise<_Node []> {
+    const db = await getDB();
+    const res: _Node [] = await db.select().from(dir)
+      .where(and(eq(dir.owner_id, dir.parent_id), eq(dir.is_public, true)));
+
+    return res;
+  }
 }

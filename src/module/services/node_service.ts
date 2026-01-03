@@ -238,7 +238,7 @@ export class NodeService {
     }
   }
 
-  static async get_folder_by_link(link: string [], owner_id: string, user_id: string): Promise<ResponseList> {
+  static async get_content_by_link(link: string [], owner_id: string, user_id: string): Promise<ResponseList> {
     try {
       let list: _Node [] = await NodeRepo.get_repo_list(owner_id);
       if(owner_id == user_id) {
@@ -286,7 +286,7 @@ export class NodeService {
     }
   }
 
-  static async get_parent_id_by_link(link: string [], owner_id: string, user_id: string): Promise<Response> {
+  static async get_node_id_by_link(link: string [], owner_id: string, user_id: string): Promise<Response> {
     try {
       let list: _Node [];
       if(owner_id == user_id) {
@@ -324,6 +324,16 @@ export class NodeService {
       return { status: 200, message: (await NodeRepo.get_repo_list(user_id)).length.toString() };
     } catch {
       return { status: 500, message: iserror };
+    }
+  }
+
+  static async get_all_public_repo(): Promise<ResponseList> {
+    try {
+      let list: _Node [] = await NodeRepo.get_all_public_repo();
+
+      return { status: 200, message: success, list: list };
+    } catch {
+      return { status: 500, message: iserror, list: null };
     }
   }
 }

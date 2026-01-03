@@ -238,4 +238,31 @@ export class AuthService {
       return { status: 500, message: iserror };
     }
   }
+
+  static async set_mail(token: string, email: string): Promise<Response> {
+    try {
+      const secret: string = process.env.JWT_SECRET ?? 'rafat';
+
+      let decoded: VerifiedResetToken;
+      try {
+        decoded = verify(token, secret) as VerifiedResetToken;
+      } catch {
+        return { status: 500, message: 'Invalid or expired token!' };
+      }
+
+      if (!decoded.can_reset) {
+        return { status: 500, message: 'OTP not verified' };
+      }
+
+      if ((await UserRepo.find_by_email(email)) == false) {
+        return { status: 500, message: 'User not found!' };
+      }
+
+      await UserRepo.update_mail(email, decoded.email);
+
+      return { status: 200, message:'E-Mail updated successfully!' };
+    } catch {
+      return { status: 500, message: iserror };
+    }
+  }
 }

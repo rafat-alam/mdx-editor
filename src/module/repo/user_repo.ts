@@ -34,6 +34,11 @@ export class UserRepo {
     await db.update(user).set({ password_hash: password_hash }).where(eq(user.email, email));
   }
 
+  static async update_mail(email: string, new_email: string): Promise<any> {
+    const db = await getDB();
+    await db.update(user).set({ email: new_email }).where(eq(user.email, email));
+  }
+
   static async get_user(username: string): Promise<User []> {
     const db = await getDB();
     const res = await db.select().from(user).where(eq(user.username, username));
