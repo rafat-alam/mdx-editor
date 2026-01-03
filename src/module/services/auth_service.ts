@@ -281,7 +281,7 @@ export class AuthService {
         return { status: 500, message: 'E-Mail already used!' };
       }
 
-      await UserRepo.update_mail(email, decoded.email);
+      await UserRepo.update_email(email, decoded.email);
 
       return { status: 200, message:'E-Mail updated successfully!' };
     } catch {

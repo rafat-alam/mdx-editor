@@ -231,6 +231,7 @@ export class NodeService {
       if(await NodeRepo.is_repo_owner(repo_id, user_id)) {
         return { status: 500, message: iserror };
       }
+      await NodeRepo.update_time(repo_id);
       await NodeRepo.set_repo_vis(repo_id, user_id, vis);
       return { status: 200, message: success };
     } catch {

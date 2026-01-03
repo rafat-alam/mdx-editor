@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
 
     const token = await getToken({ req, secret });
     if (!token || !token.user_id) {
-      return NextResponse.json({ message: 'User not authenticated!' }, { status: 400 });
+      return NextResponse.json({ message: 'User not authenticated!' }, { status: 500 });
     }
 
     if(path.length < 3) {

@@ -83,7 +83,7 @@ export class UserService {
       }
 
       UserRepo.set_time(username);
-      return { status: 500, message: success };
+      return { status: 200, message: success };
     } catch {
       return { status: 500, message: iserror };
     }

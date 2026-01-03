@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
     const token = await getToken({ req, secret });
     if (!token || !token.user_id) {
-      return NextResponse.json({ message: 'User not authenticated!' }, { status: 400 });
+      return NextResponse.json({ message: 'User not authenticated!' }, { status: 500 });
     }
 
     const nameRegex = /^[A-Za-z0-9._ -]{1,256}$/;
