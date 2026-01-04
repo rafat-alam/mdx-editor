@@ -18,7 +18,6 @@ CREATE TABLE "user" (
 	"name" text NOT NULL,
 	"email" text NOT NULL,
 	"password_hash" text NOT NULL,
-	"last_active" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "user_user_id_unique" UNIQUE("user_id"),
 	CONSTRAINT "user_username_unique" UNIQUE("username"),
 	CONSTRAINT "user_email_unique" UNIQUE("email")

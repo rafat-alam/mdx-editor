@@ -22,3 +22,5 @@ export { handler as GET, handler as POST };
 // 1. Implement Rate Limiter
 // 2. Change Username
 // 3. Change Password
+// 4. Delete Account
+// 5. Change Name

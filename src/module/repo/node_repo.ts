@@ -9,9 +9,9 @@ export class NodeRepo {
     await db.insert(dir).values(node);
   }
 
-  static async get_list(id: string): Promise<_Node []> {
+  static async get_list(parent_id: string): Promise<_Node []> {
     const db = await getDB();
-    const res: _Node [] = await db.select().from(dir).where(eq(dir.parent_id, id));
+    const res: _Node [] = await db.select().from(dir).where(eq(dir.parent_id, parent_id));
 
     return res;
   }
@@ -93,16 +93,14 @@ export class NodeRepo {
 
   static async is_repo_owner(repo_id: string, user_id: string): Promise<boolean> {
     const db = await getDB();
-    const res: _Node [] = await db.select().from(dir)
-      .where(and(eq(dir.node_id, repo_id), eq(dir.parent_id, user_id), eq(dir.owner_id, dir.parent_id)));
+    const res: _Node [] = await db.select().from(dir).where(and(eq(dir.node_id, repo_id), eq(dir.parent_id, user_id)));
 
     return res.length == 0;
   }
 
-  static async set_repo_vis(repo_id: string, user_id: string, vis: boolean): Promise<any> {
+  static async set_repo_vis(repo_id: string, vis: boolean): Promise<any> {
     const db = await getDB();
-    await db.update(dir).set({ is_public: vis })
-      .where(and(eq(dir.node_id, repo_id), eq(dir.parent_id, user_id), eq(dir.owner_id, dir.parent_id)));
+    await db.update(dir).set({ is_public: vis }).where(eq(dir.node_id, repo_id));
   }
 
   static async update_time(node_id: string): Promise<any> {

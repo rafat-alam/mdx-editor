@@ -16,7 +16,6 @@ interface ResponsePublicUser {
   user: null | {
     username: string;
     name: string;
-    last_active: Date;
   };
 }
 
@@ -27,7 +26,6 @@ interface ResponsePrivateUser {
     username: string;
     name: string;
     email: string;
-    last_active: Date;
   };
 }
 
@@ -55,11 +53,20 @@ export async function GET(
     if(owner_id == user_id) {
       const res2: ResponsePrivateUser = await UserService.get_private_user(username);
 
-      return NextResponse.json({ message: "1", user: res2.user }, { status: res2.status });
+      return NextResponse.json({ message: "1", user: {
+        username: res2.user?.username,
+        name: res2.user?.name,
+        email: res2.user?.email,
+        last_active: new Date(),
+      } }, { status: res2.status });
     } else {
       const res2: ResponsePublicUser = await UserService.get_public_user(username);
 
-      return NextResponse.json({ message: "2", user: res2.user }, { status: res2.status });
+      return NextResponse.json({ message: "2", user: {
+        username: res2.user?.username,
+        name: res2.user?.name,
+        last_active: new Date(),
+      } }, { status: res2.status });
     }
   } catch {
     return NextResponse.json({ message: 'INTERNAL SERVER ERROR!' }, { status: 500 });

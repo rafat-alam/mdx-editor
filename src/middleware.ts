@@ -1,12 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { UserService } from './module/services/user_service';
 import { getToken } from 'next-auth/jwt';
-
-interface Response {
-  status: number;
-  message: string;
-}
 
 export async function middleware(req: NextRequest) {
   const token = await getToken({ req });
@@ -17,6 +11,7 @@ export async function middleware(req: NextRequest) {
     '/api/ai',
     '/api/auth/change-email',
     '/api/auth/last-active',
+    '/api/auth/me',
     '/api/edit/add-file',
     '/api/edit/add-folder',
     '/api/edit/add-repo',
@@ -50,6 +45,8 @@ export async function middleware(req: NextRequest) {
       const res = NextResponse.redirect(new URL("/signin", req.url));
       res.cookies.delete("next-auth.session-token");
       res.cookies.delete("__Secure-next-auth.session-token");
+      res.cookies.delete("next-auth.csrf-token");
+      res.cookies.delete("__Secure-next-auth.csrf-token");
       return res;
     }
   }
@@ -64,3 +61,17 @@ export async function middleware(req: NextRequest) {
 
   return NextResponse.next();
 }
+
+export const config = {
+  matcher: [
+    '/api/:path*',
+    '/',
+    '/about',
+    '/editor',
+    '/forgot-pass',
+    '/r/:path*',
+    '/signin',
+    '/signup',
+    '/u/:path*'
+  ],
+};

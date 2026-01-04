@@ -15,7 +15,6 @@ interface ResponsePublicUser {
   user: null | {
     username: string;
     name: string;
-    last_active: Date;
   };
 }
 
@@ -26,7 +25,6 @@ interface ResponsePrivateUser {
     username: string;
     name: string;
     email: string;
-    last_active: Date;
   };
 }
 
@@ -38,7 +36,6 @@ export class UserService {
         return { status: 200, message: success, user: { 
           username: user[0].username,
           name: user[0].name,
-          last_active: user[0].last_active
         }};
       }
       return { status: 400, message: 'No user found!', user: null };
@@ -55,7 +52,22 @@ export class UserService {
           username: user[0].username,
           name: user[0].name,
           email: user[0].email,
-          last_active: user[0].last_active
+        }};
+      }
+      return { status: 400, message: 'No user found!', user: null };
+    } catch {
+      return { status: 500, message: iserror, user: null };
+    }
+  }
+
+  static async get_user_by_id(user_id: string): Promise<ResponsePrivateUser> {
+    try {
+      const user: User [] = await UserRepo.get_user_by_id(user_id);
+      if(user.length) {
+        return { status: 200, message: success, user: { 
+          username: user[0].username,
+          name: user[0].name,
+          email: user[0].email,
         }};
       }
       return { status: 400, message: 'No user found!', user: null };
@@ -71,19 +83,6 @@ export class UserService {
         return { status: 200, message: user[0].user_id };
       }
       return { status: 400, message: 'No user found!' };
-    } catch {
-      return { status: 500, message: iserror };
-    }
-  }
-
-  static async set_time(user_id: string): Promise<Response> {
-    try {
-      if ((await UserRepo.find_by_user_id(user_id)) == false) {
-        return { status: 500, message: 'No user found!' };
-      }
-
-      await UserRepo.set_time(user_id);
-      return { status: 200, message: success };
     } catch {
       return { status: 500, message: iserror };
     }

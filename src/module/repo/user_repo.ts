@@ -30,8 +30,7 @@ export class UserRepo {
       username: user_data.username,
       name: user_data.name,
       email: user_data.email,
-      password_hash: user_data.password_hash,
-      last_active: new Date()
+      password_hash: user_data.password_hash
     });
   }
 
@@ -51,8 +50,9 @@ export class UserRepo {
     return res;
   }
 
-  static async set_time(user_id: string): Promise<any> {
+  static async get_user_by_id(user_id: string): Promise<User []> {
     const db = await getDB();
-    await db.update(user).set({ last_active: new Date() }).where(eq(user.user_id, user_id));
+    const res = await db.select().from(user).where(eq(user.user_id, user_id));
+    return res;
   }
 }

@@ -6,7 +6,6 @@ export const user = pgTable('user', {
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
   password_hash: text('password_hash').notNull(),
-  last_active: timestamp('last_active', { withTimezone: true }).defaultNow().notNull(),
 });
 
 export const nodeTypeEnum = pgEnum('node', ["FILE", "FOLDER"]);
