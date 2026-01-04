@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ message: 'User not authenticated!' }, { status: 400 });
     }
 
-    const res: Response = await UserService.set_time(token.username);
+    const res: Response = await UserService.set_time(token.user_id);
     return NextResponse.json({ message: res.message }, { status: res.status });
   } catch {
     return NextResponse.json({ message: 'INTERNAL SERVER ERROR!' }, { status: 500 });

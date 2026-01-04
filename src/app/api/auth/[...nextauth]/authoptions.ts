@@ -5,10 +5,17 @@ import { eq, or } from "drizzle-orm";
 import { AuthOptions } from "next-auth";
 import { HelperService } from "@/module/services/helper_service";
 import type { User } from "next-auth";
+import { v4 } from "uuid";
 
 export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET ?? 'rafat',
-  session: { strategy: "jwt" },
+  session: {
+    strategy: "jwt",
+    maxAge: 604800,
+  },
+  jwt: {
+    maxAge: 604800,
+  },
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -30,12 +37,19 @@ export const authOptions: AuthOptions = {
 
         if (!is_valid) throw new Error("Invalid credentials");
 
+        const session_id = v4();
+
+        await fetch(
+          `${process.env.UPSTASH_REDIS_REST_URL}/set/session:${db_user.user_id}/${session_id}?ex=604800`, {
+          headers: {
+            Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
+          },
+        });
+
         return {
           id: db_user.user_id,
           user_id: db_user.user_id,
-          username: db_user.username,
-          name: db_user.name,
-          email: db_user.email,
+          session_id: session_id,
         };
       },
     }),
@@ -44,19 +58,11 @@ export const authOptions: AuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.user_id = user.user_id;
-        token.username = user.username;
-        token.name = user.name;
-        token.email = user.email;
+        token.session_id = user.session_id;
       }
       return token;
     },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.user_id = token.user_id as string;
-        session.user.username = token.username as string;
-        session.user.name = token.name as string;
-        session.user.email = token.email as string;
-      }
+    async session({ session }) {
       return session;
     },
   },

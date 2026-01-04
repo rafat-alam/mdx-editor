@@ -6,10 +6,10 @@ export const user = pgTable('user', {
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
   password_hash: text('password_hash').notNull(),
-  last_active: timestamp("last_active", { withTimezone: true }).defaultNow().notNull(),
+  last_active: timestamp('last_active', { withTimezone: true }).defaultNow().notNull(),
 });
 
-export const nodeTypeEnum = pgEnum("node_type", ["FILE", "FOLDER"]);
+export const nodeTypeEnum = pgEnum('node', ["FILE", "FOLDER"]);
 
 export const dir = pgTable('dir', {
   node_id: text('node_id').notNull().unique().primaryKey(),
@@ -19,7 +19,7 @@ export const dir = pgTable('dir', {
   content: text('content'),
   owner_id: text('owner_id').notNull(),
   parent_id: text('parent_id').notNull(),
-  last_updated: timestamp("last_updated", { withTimezone: true }).defaultNow().notNull(),
+  last_updated: timestamp('last_updated', { withTimezone: true }).defaultNow().notNull(),
 });
 
 // npx drizzle-kit generate

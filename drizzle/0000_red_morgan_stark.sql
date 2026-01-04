@@ -1,8 +1,9 @@
-CREATE TYPE "public"."node_type" AS ENUM('FILE', 'FOLDER');--> statement-breakpoint
+DROP TYPE IF EXISTS "public"."node" CASCADE;
+CREATE TYPE "public"."node" AS ENUM('FILE', 'FOLDER');--> statement-breakpoint
 CREATE TABLE "dir" (
 	"node_id" text PRIMARY KEY NOT NULL,
 	"node_name" text NOT NULL,
-	"node_type" "node_type" NOT NULL,
+	"node_type" "node" NOT NULL,
 	"is_public" boolean,
 	"content" text,
 	"owner_id" text NOT NULL,

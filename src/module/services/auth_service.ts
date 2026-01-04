@@ -262,7 +262,7 @@ export class AuthService {
     }
   }
 
-  static async set_email(token: string, email: string): Promise<Response> {
+  static async set_email(token: string, user_id: string): Promise<Response> {
     try {
       const secret: string = process.env.JWT_SECRET ?? 'rafat';
 
@@ -281,7 +281,7 @@ export class AuthService {
         return { status: 500, message: 'E-Mail already used!' };
       }
 
-      await UserRepo.update_email(email, decoded.email);
+      await UserRepo.update_email(user_id, decoded.email);
 
       return { status: 200, message:'E-Mail updated successfully!' };
     } catch {

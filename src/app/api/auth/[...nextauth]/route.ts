@@ -22,4 +22,4 @@ export { handler as GET, handler as POST };
 // 1. Implement Rate Limiter
 // 2. Update Middlewares
 // 3. Change Username
-// 4. Disqualify previous login on new login (session_version)
+// 4. Change Password

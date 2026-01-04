@@ -1,49 +1,66 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { UserService } from './module/services/user_service';
+import { getToken } from 'next-auth/jwt';
 
-export function middleware(request: NextRequest) {
-  const token =
-    request.cookies.get('next-auth.session-token')?.value ??
-    request.cookies.get('__Secure-next-auth.session-token')?.value;
+interface Response {
+  status: number;
+  message: string;
+}
 
-  const { pathname } = request.nextUrl;
+export async function middleware(req: NextRequest) {
+  const token = await getToken({ req });
 
-  const protectedPaths1: any = [
-    // '/api/ai',
-    // '/editor'
+  const { pathname } = req.nextUrl;
+
+  const protectedPaths1 = [
+    '/api/ai',
+    '/api/auth/change-email',
+    '/api/auth/last-active',
+    '/api/edit/add-file',
+    '/api/edit/add-folder',
+    '/api/edit/add-repo',
+    '/api/edit/remove',
+    '/api/edit/rename',
+    '/api/edit/rename-repo',
+    '/api/edit/save',
+    '/api/edit/set-repo-vis',
   ];
 
-  const protectedPaths2: any = [
-    // '/signup',
-    // '/signin',
-    // '/forgot-pass',
+  const protectedPaths2 = [
+    '/api/auth/forgot-pass',
+    '/api/auth/resend-otp',
+    '/api/auth/signup',
+    '/api/auth/verify-otp',
   ];
 
-  const isProtected1 = protectedPaths1.some((path: any) => pathname.startsWith(path));
-  const isProtected2 = protectedPaths2.some((path: any) => pathname.startsWith(path));
-  if (isProtected1 && !token) {
-    return NextResponse.redirect(new URL('/signin', request.url));
+  const needs_auth = protectedPaths1.some((path) => pathname.startsWith(path));
+  const guest_only = protectedPaths2.some((path) => pathname.startsWith(path));
+
+  if (token) {
+    const redisRes = await fetch(`${process.env.UPSTASH_REDIS_REST_URL}/get/session:${token.user_id}`, {
+      headers: {
+        Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
+      },
+    });
+
+    const data = await redisRes.json();
+
+    if (!data.result || data.result !== token.session_id) {
+      const res = NextResponse.redirect(new URL("/signin", req.url));
+      res.cookies.delete("next-auth.session-token");
+      res.cookies.delete("__Secure-next-auth.session-token");
+      return res;
+    }
   }
 
-  
-  if (isProtected1 && isProtected2 && token) {
-    return NextResponse.next();
+  if (needs_auth && !token) {
+    return NextResponse.redirect(new URL('/signin', req.url));
   }
 
-  if (isProtected2 && token) {
-    return NextResponse.redirect(new URL('/', request.url));
+  if (guest_only && token) {
+    return NextResponse.redirect(new URL('/', req.url));
   }
 
   return NextResponse.next();
 }
-
-export const config = {
-  matcher: [
-    '/api/auth/:path*',
-    '/api/ai',
-    '/editor',
-    '/forgot-pass/:path*',
-    '/signin',
-    '/signup/:path*'
-  ],
-};

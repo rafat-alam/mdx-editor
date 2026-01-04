@@ -1,5 +1,5 @@
 {
-  "id": "9e6918fe-8c63-4d58-8f2c-f91572da726e",
+  "id": "c6303367-018f-4ec0-a532-a208d9e03b79",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -22,7 +22,7 @@
         },
         "node_type": {
           "name": "node_type",
-          "type": "node_type",
+          "type": "node",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
@@ -149,8 +149,8 @@
     }
   },
   "enums": {
-    "public.node_type": {
-      "name": "node_type",
+    "public.node": {
+      "name": "node",
       "schema": "public",
       "values": [
         "FILE",
