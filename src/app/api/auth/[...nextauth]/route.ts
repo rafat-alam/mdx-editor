@@ -20,6 +20,5 @@ export { handler as GET, handler as POST };
 
 // Future Backend Updates
 // 1. Implement Rate Limiter
-// 2. Update Middlewares
-// 3. Change Username
-// 4. Change Password
+// 2. Change Username
+// 3. Change Password
