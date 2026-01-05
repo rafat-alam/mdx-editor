@@ -11,87 +11,124 @@ import {
 } from "@/components/ui2/dialog"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "./ui2/textarea"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "./ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select"
 import { useState } from "react"
-import axios, { AxiosError } from "axios"
+import axios from "axios"
+import { toast } from "sonner"
 
 interface AskAIProps {
-  content: string;
-  setcontent: React.Dispatch<React.SetStateAction<string>>;
-  setloading: React.Dispatch<React.SetStateAction<boolean>>;
+  content: string
+  setcontent: React.Dispatch<React.SetStateAction<string>>
+  setloading: React.Dispatch<React.SetStateAction<boolean>>
+  disabled: boolean
 }
 
-export function AskAI({ content, setcontent, setloading } : AskAIProps) {
-  const [query, setquery] = useState("");
+export function AskAI({
+  content,
+  setcontent,
+  setloading,
+  disabled,
+}: AskAIProps) {
+  const [query, setquery] = useState("")
+  const [model, setmodel] = useState<string>("gemini-2.5-flash")
 
-  const handleSend = async () => {
-    setloading(true);
+
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    setloading(true)
     try {
-      const res = await axios.post('/api/ai/', {
+      const res = await axios.post("/api/ai/gemini", {
         content,
-        query
-      });
-      setquery("");
-      setcontent(res.data.response);
-    } catch (err) {
-      const error = err as AxiosError<{ message: string }>;
-      console.log(error.response?.data?.message || 'Query not sended');
+        query,
+        model,
+      })
+      setquery("")
+
+      if(res.status == 200) {
+        setcontent(res.data.message)
+      } else {
+        toast.error("Something went wrong!");
+      }
+    } catch {
+      toast.error("Something went wrong!");
+    } finally {
+      setloading(false)
     }
-    setloading(false);
-  };
+  }
 
   return (
     <Dialog>
-      <form>
-        <DialogTrigger asChild>
-          <Button variant="outline">Ask AI</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+      <DialogTrigger asChild>
+        <Button variant="outline" disabled={disabled}>
+          Ask AI
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="sm:max-w-[425px]">
+        <form onSubmit={handleSend}>
           <DialogHeader>
             <DialogTitle>Ask AI</DialogTitle>
             <DialogDescription>
-              Ask AI to make changes on document
+              Ask AI to make changes to the document
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4">
+
+          <div className="grid gap-4 py-4">
             <div className="grid gap-3">
-              <Label htmlFor="model">Select Model</Label>
-              <div id="model">
-                <Select>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select a model" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>LLMs</SelectLabel>
-                      <SelectItem value="Gemini">Gemini</SelectItem>
-                      <SelectItem value="o4" disabled>o4</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
+              <Label>Select Model</Label>
+              <Select value={model} onValueChange={setmodel}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a model" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Gemini Models</SelectLabel>
+                    <SelectItem value="gemini-2.0-flash-lite">Gemini 2.0 Flash Lite</SelectItem>
+                    <SelectItem value="gemini-2.0-flash">Gemini 2.0 Flash</SelectItem>
+                    <SelectItem value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite</SelectItem>
+                    <SelectItem value="gemini-2.5-flash">Gemini 2.5 Flash</SelectItem>
+                    <SelectItem value="gemini-3-flash-preview">Gemini 3 Flash (Preview)</SelectItem>
+                    <SelectLabel>OpenAI Models</SelectLabel>
+                    <SelectItem value="gpt5.2" disabled>ChatGPT 5.2</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
+
             <div className="grid gap-3">
               <Label htmlFor="query">Query</Label>
               <Textarea
                 id="query"
-                name="query"
                 placeholder="Describe your query here..."
                 value={query}
-                onChange={e => setquery(e.target.value)
-              }/>
+                onChange={(e) => setquery(e.target.value)}
+              />
             </div>
           </div>
+
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline" type="button">
+                Cancel
+              </Button>
             </DialogClose>
             <DialogClose asChild>
-              <Button type="submit" onClick={handleSend}>Submit</Button>
+              <Button type="submit" disabled={!query.trim()}>
+                Submit
+              </Button>
             </DialogClose>
           </DialogFooter>
-        </DialogContent>
-      </form>
+        </form>
+      </DialogContent>
     </Dialog>
   )
 }

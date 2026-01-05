@@ -35,63 +35,55 @@ import {
   Lock,
   FileCode,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
-interface RepoInterface {
-  id: string;
-  description: string;
-  name: string;
-  createdAt: string;
-  files: number;
-  isPublic: boolean;
+interface _Node {
+  node_name: string;
+  node_type: "FILE" | "FOLDER";
+  is_public: null | boolean;
+  last_updated: string;
 }
 
-export function Dashboard() {
-  const isRepoLoading = false;
-  const user = 'rafat';
-  const repoCount = 67;
-  const lastActive = null;
-  const [searchQuery, setSearchQuery] = useState("");
-  const [repos, setRepos] = useState<RepoInterface[]>([{
-    id: "1",
-    description: "string",
-    name: "Repo 1",
-    createdAt: "2025-09-18",
-    files: 5,
-    isPublic: false
-  },{
-    id: "2",
-    description: "string",
-    name: "Repo 2",
-    createdAt: "2025-09-18",
-    files: 5,
-    isPublic: false
-  },{
-    id: "3",
-    description: "string",
-    name: "Repo 3",
-    createdAt: "2025-09-18",
-    files: 5,
-    isPublic: false
-  },{
-    id: "4",
-    description: "string",
-    name: "Repo 4",
-    createdAt: "2025-09-18",
-    files: 5,
-    isPublic: false
-  },{
-    id: "5",
-    description: "string",
-    name: "Repo 5",
-    createdAt: "2025-09-18",
-    files: 5,
-    isPublic: false
-  }]);
+interface UserInterface {
+  username: string;
+  name: string;
+  email: null | string;
+  last_active: string;
+}
 
+interface Props {
+  path : string [];
+}
+
+export function Dashboard({ path } : Props) {
+  const [user, setUser] = useState<UserInterface | undefined>(
+    {
+      username: "rafat",
+      name: "Rafat Alam",
+      email: null,
+      last_active: "2026-01-04T10:15:30.456Z",
+    }
+  );
+  const [nodeCount, setNodeCount] = useState<number | undefined>(undefined);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [node, setNode] = useState<_Node [] | undefined>([{
+    node_name: "repo",
+    node_type: "FOLDER",
+    is_public: true,
+    last_updated: "2026-01-04T10:15:30.456Z",
+  }, {
+    node_name: "repo2",
+    node_type: "FILE",
+    is_public: true,
+    last_updated: "2026-01-04T10:15:30.456Z",
+  }]);
   const [isDeleting, setIsDeleting] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  useEffect(() => {
+    
+  }, []);
 
   const handleConfirmDelete = () => {
     setIsDeleting(true);
@@ -108,13 +100,12 @@ export function Dashboard() {
 
   }
 
-  const handleTogglePublicStatus = (checked: boolean, repo: RepoInterface) => {
-    setRepos(prev =>
-      prev.map(r => 
-        r.id === repo.id ? { ...r, isPublic: checked } : r
+  const handleTogglePublicStatus = (checked: boolean, repo: _Node) => {
+    setNode(prev =>
+      prev && prev.map(r => 
+        r.node_name === repo.node_name ? { ...r, is_public: checked } : r
       )
     );
-
   }
 
   const handleDeleteClick = () => {
@@ -132,9 +123,32 @@ export function Dashboard() {
 
   return (
     <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
-      <h1 className="text-2xl sm:text-3xl font-bold mb-2">{`Hi, ${user || 'User'}`}</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold mb-2 flex items-center">
+        {!user && (
+          <>Hi, <Skeleton className="ml-2 h-10 sm:h-8 w-16 sm:w-20" /></>
+        )}
+
+        {user && user.email && (
+          <>Hi, {user.name}</>
+        )}
+
+        {user && !user.email && (
+          <>{user.name}</>
+        )}
+      </h1>
       <p className="text-muted-foreground mb-6 sm:mb-8 text-sm sm:text-base">
-        Welcome back, Here&apos;s an overview of your activity.
+        {!user && (
+          <Skeleton className="ml-2 h-7 sm:h-5
+           w-72 sm:w-90" />
+        )}
+
+        {user && user.email && (
+          <>Welcome back, Here&apos;s an overview of your activity.</>
+        )}
+
+        {user && !user.email && (
+          <>Welcome back, Here&apos;s an overview of {user.name}'s activity.</>
+        )}
       </p>
 
       {/* Stats Overview */}
@@ -147,10 +161,10 @@ export function Dashboard() {
           <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
             <div className="flex items-center">
               <BookMarked className="h-6 w-6 sm:h-8 sm:w-8 text-primary mr-3" />
-              {isRepoLoading ? (
+              {!nodeCount ? (
                 <Skeleton className="h-8 sm:h-10 w-16 sm:w-20" />
               ) : (
-                <span className="text-2xl sm:text-3xl font-bold">{repoCount}</span>
+                <span className="text-2xl sm:text-3xl font-bold">{nodeCount}</span>
               )}
             </div>
           </CardContent>
@@ -164,9 +178,13 @@ export function Dashboard() {
           <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
             <div className="flex items-center">
               <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-primary mr-3" />
-              <span className="text-base sm:text-lg">
-                {lastActive ? formatDate(lastActive) : 'First Session'}
-              </span>
+              {!user ? (
+                <Skeleton className="h-8 sm:h-10 w-16 sm:w-20" />
+              ) : (
+                <span className="text-base sm:text-lg">
+                  {user.last_active ? formatDate(user.last_active) : 'First Session'}
+                </span>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -187,7 +205,7 @@ export function Dashboard() {
         </Button>
 
         <Button asChild variant="outline" className="h-auto py-4 sm:py-6 justify-start">
-          <Link href={`../r/${user}`} className="flex flex-col items-start">
+          <Link href={`../r/`} className="flex flex-col items-start">
             <div className="flex items-center w-full">
               <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
               <span className="font-medium text-sm sm:text-base">Your Repos...</span>
@@ -242,40 +260,40 @@ export function Dashboard() {
           </div>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
-          {isRepoLoading ? (
+          {!node ? (
             <div className="space-y-2">
               {[...Array(3)].map((_, i) => (
                 <Skeleton key={i} className="h-12 w-full" />
               ))}
             </div>
-          ) : repos.length > 0 ? (
+          ) : node.length > 0 ? (
             <div className="space-y-4">
-              {repos.map((repo) => (
-                <div key={repo.id} className="flex flex-col sm:flex-row sm:items-start sm:justify-between border-b pb-3 last:border-0 gap-2 sm:gap-0">
+              {node.map((repo) => (
+                <div key={repo.node_name} className="flex flex-col sm:flex-row sm:items-start sm:justify-between border-b pb-3 last:border-0 gap-2 sm:gap-0">
                   <div className="max-w-full sm:max-w-[60%]">
-                    <h3 className="font-medium text-sm sm:text-base truncate">{repo.name}</h3>
+                    <h3 className="font-medium text-sm sm:text-base truncate">{repo.node_name}</h3>
                     <div className="flex flex-wrap items-center text-xs sm:text-sm text-muted-foreground gap-1 sm:gap-0">
                       <div className="flex items-center">
                         <Calendar className="h-3 w-3 mr-1" />
-                        <span>{formatDate(repo.createdAt)}</span>
+                        <span>{formatDate(repo.last_updated)}</span>
                       </div>
                       <span className="mx-1 sm:mx-2 hidden sm:inline">•</span>
                       <span className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">
-                        {repo.files} {repo.files === 1 ? 'file' : 'files'}
+                        {path.length === 1 ? 'REPO' : repo.node_type}
                       </span>
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-1 sm:mt-0 justify-between sm:justify-end">
-                    <div className="flex items-center">
+                    {path.length == 1 && <div className="flex items-center">
                       <div className="flex items-center space-x-1 sm:space-x-2">
                         <Switch
-                          id={`public-toggle-${repo.id}`}
-                          checked={!!repo.isPublic}
+                          id={`public-toggle-${repo.node_name}`}
+                          checked={!!repo.is_public}
                           onCheckedChange={(checked: boolean) => handleTogglePublicStatus(checked, repo)}
                           className="scale-75 sm:scale-100"
                         />
-                        <Label htmlFor={`public-toggle-${repo.id}`} className="text-xs sm:text-sm cursor-pointer">
-                          {repo.isPublic ? (
+                        <Label htmlFor={`public-toggle-${repo.node_name}`} className="text-xs sm:text-sm cursor-pointer">
+                          {repo.is_public ? (
                             <span className="flex items-center text-green-600">
                               <Globe className="h-3 w-3 mr-1" />
                               <span className="hidden xs:inline">Public</span>
@@ -288,17 +306,17 @@ export function Dashboard() {
                           )}
                         </Label>
                       </div>
-                    </div>
+                    </div>}
                     <div className="flex items-center gap-1">
-                        <Button
+                      <Button
                         size="sm"
                         variant="ghost"
                         onClick={() => handleViewFiles()}
                         className="h-7 sm:h-9 px-2 sm:px-3 text-xs sm:text-sm hover:bg-primary/10 hover:text-primary border border-input"
                         >
                         View
-                        </Button>
-                      <Button
+                      </Button>
+                      { repo.node_type == 'FILE' && <Button
                         size="sm"
                         variant="ghost"
                         onClick={() => handleViewCombinedMdx()}
@@ -306,7 +324,7 @@ export function Dashboard() {
                         className="hover:bg-primary/10 hover:text-primary h-7 sm:h-9 w-7 sm:w-9 p-0 border border-input"
                       >
                         <FileCode className="h-3 w-3 sm:h-4 sm:w-4" />
-                      </Button>
+                      </Button> }
                       <Button
                         size="sm"
                         variant="ghost"
@@ -344,7 +362,7 @@ export function Dashboard() {
             </div>
           )}
         </CardContent>
-        {repos.length > 0 && (
+        {node && node.length > 0 && (
           <CardFooter className="border-t p-4 sm:p-6">
             <Button variant="outline" className="w-full text-xs sm:text-sm" asChild>
               <Link href="/#">Create New Repository</Link>

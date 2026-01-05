@@ -10,10 +10,11 @@ interface Response {
   message: string;
 }
 
+const DEFAULT_CONTENT = '# Hello, MDX!\n\nThis is a sample MDX document.\n\n```js\nconsole.log("Hello world");\n```\n\n## Features\n\n- **Bold text** and *italic text*\n- Lists and code blocks\n- And more!';
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    let { content } = body;
     const { path, name } = body;
 
     const token = await getToken({ req, secret });
@@ -30,8 +31,6 @@ export async function POST(req: NextRequest) {
     if(path.length < 2) {
       return NextResponse.json({ message: 'INTERNAL SERVER ERROR!' }, { status: 500 });
     }
-
-    if(!content) content = "";
     
     const res1: Response = await UserService.get_user_id(path[0]);
 
@@ -49,7 +48,7 @@ export async function POST(req: NextRequest) {
 
     const parent_id: string = res2.message;
 
-    const res3: Response = await NodeService.add_file(name, content, token.user_id, parent_id);
+    const res3: Response = await NodeService.add_file(name, DEFAULT_CONTENT, token.user_id, parent_id);
 
     return NextResponse.json({ message: res3.message }, { status: res3.status });
   } catch {
