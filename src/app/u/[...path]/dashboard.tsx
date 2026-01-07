@@ -89,9 +89,10 @@ export function Dashboard({ path } : Props) {
   const [nextChild, setNextChild] = useState("");
   const [disableSwitch, setDisableSwitch] = useState("");
   let user = useUContext();
-  const [isViewingFile, setIsViewingFile] = useState(false);
   const [isMDXDialogOpen, setIsMDXDialogOpen] = useState(false);
   const [MDXPath, setMDXPath] = useState("");
+  const [isSeeRepoDialogOpen, setIsSeeRepoDialogOpen] = useState(false);
+  const [seeRepoUsername, setSeeRepoUsername] = useState("");
 
   const handleRefresh = async () => {
     setNode(undefined);
@@ -377,7 +378,10 @@ export function Dashboard({ path } : Props) {
           asChild 
           variant="outline" 
           className="h-auto py-4 sm:py-6 justify-start"
-          onClick={() => setIsMDXDialogOpen(true)}
+          onClick={() => {
+            setMDXPath("");
+            setIsMDXDialogOpen(true)
+          }}
         >
           <div className="flex flex-col items-start">
             <div className="flex items-center w-full">
@@ -389,16 +393,23 @@ export function Dashboard({ path } : Props) {
           </div>
         </Button>
 
-
-        <Button asChild variant="outline" className="h-auto py-4 sm:py-6 justify-start">
-          <Link href={`../r/`} className="flex flex-col items-start">
+        <Button 
+          asChild 
+          variant="outline" 
+          className="h-auto py-4 sm:py-6 justify-start"
+          onClick={() => {
+            setSeeRepoUsername("")
+            setIsSeeRepoDialogOpen(true)
+          }}
+        >
+          <div className="flex flex-col items-start">
             <div className="flex items-center w-full">
               <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-              <span className="font-medium text-sm sm:text-base">Your Repos...</span>
+              <span className="font-medium text-sm sm:text-base">See Repos...</span>
               <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-auto" />
             </div>
-            <span className="text-xs sm:text-sm text-muted-foreground mt-1">See your Repositories</span>
-          </Link>
+            <span className="text-xs sm:text-sm text-muted-foreground mt-1">Search by username.</span>
+          </div>
         </Button>
 
 
@@ -584,7 +595,6 @@ export function Dashboard({ path } : Props) {
                     {(() => {
                       const owner = user.email ? "You" : user.name;
                       const isRoot = path.length === 1;
-
                       return isRoot
                         ? `${owner} haven't created any repository yet`
                         : `${owner} haven't created any files or folders in this directory`;
@@ -797,7 +807,9 @@ export function Dashboard({ path } : Props) {
               className="text-sm"
             />
             <div className='h-0 text-red-500 text-xs'>
-              {repoName.length == 0 || nameRegex.test(repoName) ? ``: `Error : Repo name is not in format`}
+              { repoName.length == 0 || nameRegex.test(repoName) 
+                ? ``
+                : `Error : Repo name is not in format`}
             </div>
           </div>
           <DialogFooter className="flex flex-col sm:flex-row justify-end gap-2">
@@ -828,8 +840,7 @@ export function Dashboard({ path } : Props) {
         </DialogContent>
       </Dialog>
 
-
-      {/* Add MDX Editor Dialog */}
+      {/* MDX Editor Dialog */}
       <Dialog open={isMDXDialogOpen} onOpenChange={setIsMDXDialogOpen}>
         <DialogContent className="sm:max-w-md max-w-[90vw] p-4 sm:p-6">
           <DialogHeader className="space-y-2">
@@ -846,9 +857,6 @@ export function Dashboard({ path } : Props) {
               onChange={(e) => setMDXPath(e.target.value)}
               className="text-sm"
             />
-            <div className='h-0 text-red-500 text-xs'>
-              {true ? ``: `Error : Path is not in format`}
-            </div>
           </div>
           <DialogFooter className="flex flex-col sm:flex-row justify-end gap-2">
             <Button
@@ -867,14 +875,54 @@ export function Dashboard({ path } : Props) {
               disabled={false}
               className="w-full sm:w-auto text-xs sm:text-sm"
             >
-              {false ? (
-                <>
-                  <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 animate-spin" />
-                  Opening...
-                </>
-              ) : (
-                'Open'
-              )}
+              Open
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* See Repos... Dialog */}
+      <Dialog open={isSeeRepoDialogOpen} onOpenChange={setIsSeeRepoDialogOpen}>
+        <DialogContent className="sm:max-w-md max-w-[90vw] p-4 sm:p-6">
+          <DialogHeader className="space-y-2">
+            <DialogTitle className="text-lg">See Repos...</DialogTitle>
+            <DialogDescription className="text-sm">
+              Discover public repositories by entering a handle or username.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3">
+            <Input
+              type="text"
+              placeholder="Enter username"
+              value={seeRepoUsername}
+              onChange={(e) => setSeeRepoUsername(e.target.value)}
+              className="pr-10 text-sm"
+            />
+            <div className="h-0 text-red-500 text-xs">
+              {seeRepoUsername.length === 0 || nameRegex.test(seeRepoUsername)
+                ? ""
+                : "Error: Username is not in valid format"}
+            </div>
+          </div>
+          <DialogFooter className="flex flex-col sm:flex-row justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsSeeRepoDialogOpen(false)}
+              disabled={false}
+              className="w-full sm:w-auto text-xs sm:text-sm"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="default"
+              onClick={() => {
+                window.open(`/r/${seeRepoUsername}`, "_blank");
+                setIsSeeRepoDialogOpen(false);
+              }}
+              disabled={false}
+              className="w-full sm:w-auto text-xs sm:text-sm"
+            >
+              Open
             </Button>
           </DialogFooter>
         </DialogContent>
