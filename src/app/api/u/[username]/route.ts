@@ -58,6 +58,7 @@ export async function GET(
         name: res2.user?.name,
         email: res2.user?.email,
         last_active: new Date(),
+        repo_count: 67,
       } }, { status: res2.status });
     } else {
       const res2: ResponsePublicUser = await UserService.get_public_user(username);
@@ -65,7 +66,9 @@ export async function GET(
       return NextResponse.json({ message: "2", user: {
         username: res2.user?.username,
         name: res2.user?.name,
+        email: null,
         last_active: new Date(),
+        repo_count: 67,
       } }, { status: res2.status });
     }
   } catch {

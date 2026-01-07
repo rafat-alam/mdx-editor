@@ -232,7 +232,7 @@ export class NodeService {
         return { status: 500, message: iserror };
       }
       await NodeRepo.update_time(repo_id);
-      await NodeRepo.set_repo_vis(repo_id, user_id, vis);
+      await NodeRepo.set_repo_vis(repo_id, vis);
       return { status: 200, message: success };
     } catch {
       return { status: 500, message: iserror };
