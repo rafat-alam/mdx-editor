@@ -26,7 +26,6 @@ export async function NavMenu() {
         <a href="/" className="text-2xl font-semibold">MDX Editor</a>
         <a href="/about" className={navigationMenuTriggerStyle()}>About</a>
         <a href="/mdx-public" className={navigationMenuTriggerStyle()}>MDX Public</a>
-        {session && <a href="/editor" className={navigationMenuTriggerStyle()}>MDX Editor</a>}
       </div>
 
       {/* Right side */}
