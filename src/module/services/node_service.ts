@@ -7,13 +7,6 @@ interface Response {
   message: string;
 }
 
-// Depricated
-interface ResponseRepo {
-  status: number;
-  message: string;
-  list: null | any;
-}
-
 interface ResponseList {
   status: number;
   message: string;
@@ -42,7 +35,7 @@ export class NodeService {
   static async add_folder(node_name: string, user_id: string, parent_id: string): Promise<Response> {
     try {
       if(await NodeRepo.is_parent_not_folder(parent_id, user_id)) {
-        return { status: 500, message: iserror };
+        return { status: 403, message: 'Access Forbidden!' };
       }
 
       if(await NodeRepo.is_name_already_present(parent_id, node_name)) {
@@ -61,7 +54,7 @@ export class NodeService {
   static async add_file(node_name: string, content: string, user_id: string, parent_id: string): Promise<Response> {
     try {
       if(await NodeRepo.is_parent_not_folder(parent_id, user_id)) {
-        return { status: 500, message: iserror };
+        return { status: 403, message: 'Access Forbidden!' };
       }
 
       if(await NodeRepo.is_name_already_present(parent_id, node_name)) {
@@ -77,69 +70,10 @@ export class NodeService {
     }
   }
 
-  // Deprecated
-  private static async get_node_list(node_id: string) {
-    const li: _Node [] = await NodeRepo.get_list(node_id);
-
-    let res: any = [];
-
-    for(const l of li) {
-      let list: any = {
-        _id: l.node_id,
-        name: l.node_name,
-        checked: 0,
-        isOpen: false,
-        node_type: l.node_type,
-        is_public: l.is_public,
-        content: l.content,
-        owner_id: l.owner_id,
-        parent_id: l.parent_id,
-        last_updated: l.last_updated,
-        children: await this.get_node_list(l.node_id),
-      };
-
-      res.push(list);
-    }
-
-    return res;
-  }
-
-  // Deprecated
-  private static async get_repo(node_id: string, user_id: string): Promise<ResponseRepo> {
-    try {
-      if(await NodeRepo.is_repo_not_present(node_id)) {
-        return { status: 500, message: iserror, list: null };
-      }
-
-      let res: _Node = await NodeRepo.get_node(node_id);
-
-      if(res.is_public == false && res.owner_id != user_id) {
-        return { status: 500, message: iserror, list: null };
-      }
-
-      return { status: 200, message: success, list: {
-          _id: res.node_id,
-          name: res.node_name,
-          checked: 0,
-          isOpen: false,
-          node_type: res.node_type,
-          is_public: res.is_public,
-          content: res.content,
-          owner_id: res.owner_id,
-          parent_id: res.parent_id,
-          last_updated: res.last_updated,
-          children: await this.get_node_list(res.node_id),
-        }
-      };
-    } catch {
-      return { status: 500, message: iserror, list: null };
-    }
-  }
-
   static async rename_repo(repo_id: string, new_name: string, user_id: string): Promise<Response> {
     try {
       if(await NodeRepo.is_repo_owner(repo_id, user_id)) {
-        return { status: 500, message: iserror };
+        return { status: 403, message: 'Access Forbidden!' };
       }
       if(await NodeRepo.is_name_already_present(user_id, new_name)) {
         return { status: 400, message: 'Repo with same name already Present!' };
@@ -157,7 +91,7 @@ export class NodeService {
   static async rename(parent_id: string, node_id: string, new_name: string, user_id: string): Promise<Response> {
     try {
       if(await NodeRepo.is_parent_not_folder(parent_id, user_id)) {
-        return { status: 500, message: iserror };
+        return { status: 403, message: 'Access Forbidden!' };
       }
 
       if(await NodeRepo.is_name_already_present(parent_id, new_name)) {
@@ -176,7 +110,7 @@ export class NodeService {
   static async save(node_id: string, new_content: string, user_id: string): Promise<Response> {
     try {
       if(await NodeRepo.is_file_present(node_id, user_id)) {
-        return { status: 500, message: iserror };
+        return { status: 403, message: 'Access Forbidden!' };
       }
 
       await NodeRepo.update_time(node_id);
@@ -193,7 +127,7 @@ export class NodeService {
       let res: _Node = await NodeRepo.get_node(node_id);
 
       if(res.owner_id != user_id) {
-        return { status: 500, message: iserror };
+        return { status: 403, message: 'Access Forbidden!' };
       }
 
       let list: string [] = [node_id];
@@ -213,23 +147,10 @@ export class NodeService {
     }
   }
 
-  // Deprecated
-  private static async get_repo_list(owner_id: string, user_id: string): Promise<ResponseList> {
-    try {
-      if(owner_id == user_id) {
-        return { status: 200, message: success, list: await NodeRepo.get_repo_list(owner_id) };
-      } else {
-        return { status: 200, message: success, list: await NodeRepo.get_public_repo_list(owner_id) };
-      }
-    } catch {
-      return { status: 500, message: iserror, list: null };
-    }
-  }
-
   static async set_repo_vis(repo_id: string, user_id: string, vis: boolean): Promise<Response> {
     try {
       if(await NodeRepo.is_repo_owner(repo_id, user_id)) {
-        return { status: 500, message: iserror };
+        return { status: 403, message: 'Access Forbidden!' };
       }
       await NodeRepo.update_time(repo_id);
       await NodeRepo.set_repo_vis(repo_id, vis);
@@ -262,7 +183,7 @@ export class NodeService {
           if(content != null) {
             return { status: 200, message: content, list: null };
           } else {
-            return { status: 400, message: 'Page Not Found!', list: null };
+            return { status: 404, message: 'Page Not Found!', list: null };
           }
         }
 
@@ -307,7 +228,7 @@ export class NodeService {
         }
 
         if(next_folder_id == null) {
-          return { status: 400, message: 'Page Not Found!' };
+          return { status: 404, message: 'Page Not Found!' };
         }
 
         parent_id = next_folder_id;
@@ -320,9 +241,13 @@ export class NodeService {
     }
   }
 
-  static async user_repo_count(user_id: string): Promise<Response> {
+  static async user_repo_count(owner_id: string, user_id: string): Promise<Response> {
     try {
-      return { status: 200, message: (await NodeRepo.get_repo_list(user_id)).length.toString() };
+      if(owner_id == user_id) {
+        return { status: 200, message: (await NodeRepo.get_repo_list(owner_id)).length.toString() };
+      } else {
+        return { status: 200, message: (await NodeRepo.get_public_repo_list(owner_id)).length.toString() };
+      }
     } catch {
       return { status: 500, message: iserror };
     }

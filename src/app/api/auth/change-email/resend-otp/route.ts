@@ -13,12 +13,12 @@ export async function POST(req: NextRequest) {
   try {
     const { token } = await req.json();
     if (!token) {
-      return NextResponse.json({ message: 'Invalid or expired token!' }, { status: 500 });
+      return NextResponse.json({ message: 'Invalid or expired token!' }, { status: 401 });
     }
 
     const jwt_token = await getToken({ req, secret });
     if (!jwt_token || !jwt_token.user_id) {
-      return NextResponse.json({ message: 'User not authenticated!' }, { status: 500 });
+      return NextResponse.json({ message: 'User not authenticated!' }, { status: 401 });
     }
 
     const res: Response = await AuthService.forgot_pass_or_change_email_resend_otp(token);

@@ -15,17 +15,17 @@ export async function POST(req: NextRequest) {
 
     const token = await getToken({ req, secret });
     if (!token || !token.user_id) {
-      return NextResponse.json({ message: 'User not authenticated!' }, { status: 500 });
+      return NextResponse.json({ message: 'User not authenticated!' }, { status: 401 });
     }
 
-    const nameRegex = /^[A-Za-z0-9._ -]{1,256}$/;
+    const name_regex = /^[A-Za-z0-9._ -]{1,256}$/;
 
-    if (!nameRegex.test(old_name)) {
+    if (!name_regex.test(new_name)) {
       return NextResponse.json({ message: 'Name of Repo is not in valid format!' }, { status: 400 });
     }
 
     if (!old_name || !new_name) {
-      return NextResponse.json({ message: 'INTERNAL SERVER ERROR!' }, { status: 500 });
+      return NextResponse.json({ message: 'Missing Fields!' }, { status: 400 });
     }
 
     const res1: Response = await NodeService.get_node_id_by_link([ old_name ], token.user_id, token.user_id);

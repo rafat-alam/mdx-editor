@@ -71,7 +71,7 @@ export class AuthService {
       try {
         decoded = verify(token, secret) as DecodedToken;
       } catch {
-        return { status: 500, message: 'Invalid or expired token!' };
+        return { status: 401, message: 'Invalid or expired token!' };
       }
 
       if (decoded.otp_expiry >= Date.now()) {
@@ -101,7 +101,7 @@ export class AuthService {
       try {
         decoded = verify(token, secret) as DecodedToken;
       } catch {
-        return { status: 500, message: 'Invalid or expired token!' };
+        return { status: 401, message: 'Invalid or expired token!' };
       }
 
       if (decoded.otp !== otp) {
@@ -113,11 +113,11 @@ export class AuthService {
       }
 
       if (await UserRepo.find_by_username(decoded.temp_user.username)) {
-        return { status: 500, message: 'Username already taken!' };
+        return { status: 401, message: 'Username already taken!' };
       }
 
       if (await UserRepo.find_by_email(decoded.temp_user.username)) {
-        return { status: 500, message: 'Email already used!' };
+        return { status: 401, message: 'Email already used!' };
       }
 
       await UserRepo.create(decoded.temp_user);
@@ -160,7 +160,7 @@ export class AuthService {
       try {
         decoded = verify(token, secret) as ResetToken;
       } catch {
-        return { status: 500, message: 'Invalid or expired token!' };
+        return { status: 401, message: 'Invalid or expired token!' };
       }
 
       if (decoded.otp_expiry >= Date.now()) {
@@ -190,7 +190,7 @@ export class AuthService {
       try {
         decoded = verify(token, secret) as ResetToken;
       } catch {
-        return { status: 500, message: 'Invalid or expired token!' };
+        return { status: 401, message: 'Invalid or expired token!' };
       }
       
       if (decoded.otp !== otp) {
@@ -218,15 +218,15 @@ export class AuthService {
       try {
         decoded = verify(token, secret) as VerifiedResetToken;
       } catch {
-        return { status: 500, message: 'Invalid or expired token!' };
+        return { status: 401, message: 'Invalid or expired token!' };
       }
 
       if (!decoded.can_reset) {
-        return { status: 500, message: 'OTP not verified' };
+        return { status: 401, message: 'OTP not verified' };
       }
 
       if ((await UserRepo.find_by_email(decoded.email)) == false) {
-        return { status: 500, message: 'User not found!' };
+        return { status: 401, message: 'User not found!' };
       }
 
       const password_hash = HelperService.hash(password);
@@ -270,15 +270,15 @@ export class AuthService {
       try {
         decoded = verify(token, secret) as VerifiedResetToken;
       } catch {
-        return { status: 500, message: 'Invalid or expired token!' };
+        return { status: 401, message: 'Invalid or expired token!' };
       }
 
       if (!decoded.can_reset) {
-        return { status: 500, message: 'OTP not verified' };
+        return { status: 401, message: 'OTP not verified' };
       }
 
       if (await UserRepo.find_by_email(decoded.email)) {
-        return { status: 500, message: 'E-Mail already used!' };
+        return { status: 401, message: 'E-Mail already used!' };
       }
 
       await UserRepo.update_email(user_id, decoded.email);

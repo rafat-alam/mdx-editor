@@ -11,15 +11,17 @@ interface Response {
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, vis } = await req.json();
+    let { name, vis } = await req.json();
+
+    name = name.trim();
 
     const token = await getToken({ req, secret });
     if (!token || !token.user_id) {
-      return NextResponse.json({ message: 'User not authenticated!' }, { status: 500 });
+      return NextResponse.json({ message: 'User not authenticated!' }, { status: 401 });
     }
 
     if (!name) {
-      return NextResponse.json({ message: 'INTERNAL SERVER ERROR!' }, { status: 500 });
+      return NextResponse.json({ message: 'Missing Fields!' }, { status: 400 });
     }
 
     const res1: Response = await NodeService.get_node_id_by_link([ name ], token.user_id, token.user_id);

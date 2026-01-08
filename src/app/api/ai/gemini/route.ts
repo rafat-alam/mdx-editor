@@ -7,18 +7,16 @@ export async function POST(req: NextRequest) {
   try {
     const { content, query, model } = await req.json();
 
-    if (!query) {
-      return NextResponse.json({ message: 'Missing currentQuery' }, { status: 400 });
+    if (!query || !model) {
+      return NextResponse.json({ message: 'Missing fields!' }, { status: 400 });
     }
 
     const gen_model = genAI.getGenerativeModel({ 
       model: model,
-      systemInstruction: 'you are a document updatetor or generator on previous document you can generate new one on basis of query, if there is no update pass-on the previous content as it is. You are been given with a MDX document and your response shoud me in MDX as normally you send it in MDX.'
+      systemInstruction: 'You are a document updater and generator that operates strictly on an existing MDX document based on a given query or instruction; update or generate content only when explicitly required by the query while preserving all unaffected content exactly as provided, return the original document unchanged if no update is necessary, do not introduce unsolicited changes, reformatting, explanations, comments, or metadata, ensure the response is valid MDX returned exclusively in MDX format, and do not start the response with ```mdx or end it with ``` under any circumstances.'
     });
 
-    const prompt = content
-      ? `Previous content:\n${content}\n\nNow update or answer with this new input:\n${query}`
-      : query;
+    const prompt = `Previous content:\n${content ? content : "null"}\n\nNow update or answer with this query:\n${query}`;
 
     const result = await gen_model.generateContent(prompt);
 

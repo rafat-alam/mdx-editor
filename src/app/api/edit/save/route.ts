@@ -10,22 +10,22 @@ interface Response {
   message: string;
 }
 
+const DEFAULT_CONTENT = '# Hello, MDX!\n\nThis is a sample MDX document.\n\n```js\nconsole.log("Hello world");\n```\n\n## Features\n\n- **Bold text** and *italic text*\n- Lists and code blocks\n- And more!';
+
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    let { content } = body;
-    const { path } = body;
+    let { content, path } = await req.json();
 
     const token = await getToken({ req, secret });
     if (!token || !token.user_id) {
-      return NextResponse.json({ message: 'User not authenticated!' }, { status: 500 });
+      return NextResponse.json({ message: 'User not authenticated!' }, { status: 401 });
     }
 
     if(path.length < 3) {
-      return NextResponse.json({ message: 'INTERNAL SERVER ERROR!' }, { status: 500 });
+      return NextResponse.json({ message: 'Access Forbidden!' }, { status: 403 });
     }
 
-    if(!content) content = "";
+    content ??= DEFAULT_CONTENT;
     
     const res1: Response = await UserService.get_user_id(path[0]);
 

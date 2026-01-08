@@ -12,21 +12,24 @@ interface Response {
 
 export async function POST(req: NextRequest) {
   try {
-    const { path, name } = await req.json();
+    let { path, name } = await req.json();
+
+    name = name.trim();
 
     const token = await getToken({ req, secret });
+  
     if (!token || !token.user_id) {
-      return NextResponse.json({ message: 'User not authenticated!' }, { status: 500 });
+      return NextResponse.json({ message: 'User not authenticated!' }, { status: 401 });
     }
 
-    const nameRegex = /^[A-Za-z0-9._ -]{1,256}$/;
+    const name_regex = /^[A-Za-z0-9._ -]{1,256}$/;
 
-    if (!nameRegex.test(name)) {
+    if (!name_regex.test(name)) {
       return NextResponse.json({ message: 'Name of Folder is not in valid format!' }, { status: 400 });
     }
 
     if(path.length < 2) {
-      return NextResponse.json({ message: 'INTERNAL SERVER ERROR!' }, { status: 500 });
+      return NextResponse.json({ message: 'Access Forbidden!' }, { status: 403 });
     }
     
     const res1: Response = await UserService.get_user_id(path[0]);

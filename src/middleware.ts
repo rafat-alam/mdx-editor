@@ -33,13 +33,20 @@ export async function middleware(req: NextRequest) {
   const guest_only = protectedPaths2.some((path) => pathname.startsWith(path));
 
   if (token) {
-    const redisRes = await fetch(`${process.env.UPSTASH_REDIS_REST_URL}/get/session:${token.user_id}`, {
+    const redis_res = await fetch(`${process.env.UPSTASH_REDIS_REST_URL}/get/session:${token.user_id}`, {
       headers: {
         Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
       },
     });
 
-    const data = await redisRes.json();
+    await fetch(
+      `${process.env.UPSTASH_REDIS_REST_URL}/set/last-active:${token.user_id}/${Date.now()}`, {
+      headers: {
+        Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
+      },
+    });
+
+    const data = await redis_res.json();
 
     if (!data.result || data.result !== token.session_id) {
       const res = NextResponse.redirect(new URL("/signin", req.url));

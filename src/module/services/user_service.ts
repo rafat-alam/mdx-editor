@@ -38,7 +38,7 @@ export class UserService {
           name: user[0].name,
         }};
       }
-      return { status: 400, message: 'No user found!', user: null };
+      return { status: 404, message: 'No user found!', user: null };
     } catch {
       return { status: 500, message: iserror, user: null };
     }
@@ -54,7 +54,7 @@ export class UserService {
           email: user[0].email,
         }};
       }
-      return { status: 400, message: 'No user found!', user: null };
+      return { status: 404, message: 'No user found!', user: null };
     } catch {
       return { status: 500, message: iserror, user: null };
     }
@@ -67,10 +67,10 @@ export class UserService {
         return { status: 200, message: success, user: { 
           username: user[0].username,
           name: user[0].name,
-          email: user[0].email,
+          email: user[0].email
         }};
       }
-      return { status: 400, message: 'No user found!', user: null };
+      return { status: 404, message: 'No user found!', user: null };
     } catch {
       return { status: 500, message: iserror, user: null };
     }
@@ -82,7 +82,7 @@ export class UserService {
       if(user.length) {
         return { status: 200, message: user[0].user_id };
       }
-      return { status: 400, message: 'No user found!' };
+      return { status: 404, message: 'No user found!' };
     } catch {
       return { status: 500, message: iserror };
     }

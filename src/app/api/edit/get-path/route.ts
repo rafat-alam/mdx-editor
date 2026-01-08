@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     }
 
     if(path.length < 1) {
-      return NextResponse.json({ message: 'INTERNAL SERVER ERROR!', list: null }, { status: 500 });
+      return NextResponse.json({ message: 'Access Forbidden!', list: null }, { status: 403 });
     }
     
     const res1: Response = await UserService.get_user_id(path[0]);
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     const res2: ResponseList = await NodeService.get_content_by_link(path.slice(1), owner_id, user_id);
 
     if(res2.status != 200) {
-      return NextResponse.json({ message: res2.message, list: res2.list }, { status: res2.status });
+      return NextResponse.json({ message: res2.message, list: null }, { status: res2.status });
     }
 
     const sanitized_list = res2.list?.map(item => ({

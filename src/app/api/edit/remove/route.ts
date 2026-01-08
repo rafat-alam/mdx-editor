@@ -16,11 +16,11 @@ export async function POST(req: NextRequest) {
 
     const token = await getToken({ req, secret });
     if (!token || !token.user_id) {
-      return NextResponse.json({ message: 'User not authenticated!' }, { status: 500 });
+      return NextResponse.json({ message: 'User not authenticated!' }, { status: 401 });
     }
 
     if(path.length < 2) {
-      return NextResponse.json({ message: 'INTERNAL SERVER ERROR!' }, { status: 500 });
+      return NextResponse.json({ message: 'Access Forbidden!' }, { status: 403 });
     }
     
     const res1: Response = await UserService.get_user_id(path[0]);

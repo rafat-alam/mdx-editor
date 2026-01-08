@@ -9,11 +9,13 @@ interface Response {
 export async function POST(req: NextRequest) {
   try {
     const { token, otp } = await req.json();
+    
     if (!otp) {
       return NextResponse.json({ message: 'Missing OTP!' }, { status: 400 });
     }
+
     if (!token) {
-      return NextResponse.json({ message: 'Invalid or expired token!' }, { status: 500 });
+      return NextResponse.json({ message: 'Invalid or expired token!' }, { status: 401 });
     }
 
     const res: Response = await AuthService.verify_otp(token, otp);

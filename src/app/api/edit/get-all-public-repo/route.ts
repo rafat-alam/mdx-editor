@@ -13,7 +13,7 @@ export async function GET() {
     const res: ResponseList = await NodeService.get_all_public_repo();
 
     if(res.status != 200) {
-      return NextResponse.json({ message: res.message, list: res.list }, { status: res.status });
+      return NextResponse.json({ message: res.message, list: null }, { status: res.status });
     }
 
     const sanitized_list = res.list?.map(item => ({

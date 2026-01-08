@@ -29,7 +29,7 @@ export function SignInForm({
     e.preventDefault();
     dispatch(setLoading3(true));
     const res = await signIn('credentials', {
-      email_username: email_username.trim().toLowerCase(),
+      identifier: email_username.trim().toLowerCase(),
       password: password.trim(),
       redirect: false,
     });
