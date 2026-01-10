@@ -15,10 +15,9 @@ import Image from 'next/image';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/authoptions';
 
-export async function AboutPage() {
+export async function AboutMerge() {
   const session = await getServerSession(authOptions);
   
-
   return (
     <div className="flex flex-col min-h-screen w-full">
       {/* Hero Section */}

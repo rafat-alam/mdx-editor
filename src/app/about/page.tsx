@@ -1,9 +1,5 @@
-import { AboutPage } from '@/components/about-page'
+import { About } from "@/components/about";
 
-export default function About() {
-  return (
-    <>
-      <AboutPage />
-    </>
-  )
+export default function Page() {
+  return <About />;
 }
