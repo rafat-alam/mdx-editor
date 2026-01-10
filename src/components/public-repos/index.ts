@@ -1,14 +1,14 @@
 export { PublicRepos } from './PublicRepos';
-export { PublicReposCard } from './PublicReposCard';
-export { SearchBar } from './SearchBar';
-export { PublicReposSkeleton } from './PublicReposSkeleton';
 export { EmptyState } from './EmptyState';
-export { RepoList } from './RepoList';
-export { RepoItem } from './RepoItem';
-export { RepoHeader } from './RepoHeader';
-export { RepoMetadata } from './RepoMetadata';
+export { PublicReposCard } from './PublicReposCard';
+export { PublicReposSkeleton } from './PublicReposSkeleton';
 export { RepoActions } from './RepoActions';
+export { RepoHeader } from './RepoHeader';
+export { RepoItem } from './RepoItem';
+export { RepoList } from './RepoList';
+export { RepoMetadata } from './RepoMetadata';
+export { SearchBar } from './SearchBar';
 export { formatDate } from './utils';
 
 // Deprecated
-export { PublicReposMerge } from './PublicReposMerge';
+export { PublicReposOLD } from './-PublicReposOLD';

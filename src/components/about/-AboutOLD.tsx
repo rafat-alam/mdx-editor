@@ -15,7 +15,7 @@ import Image from 'next/image';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/authoptions';
 
-export async function AboutMerge() {
+export async function AboutOLD() {
   const session = await getServerSession(authOptions);
   
   return (

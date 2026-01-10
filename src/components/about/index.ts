@@ -7,4 +7,4 @@ export { TeamSection } from './TeamSection';
 export { TechnologySection } from './TechnologySection';
 
 // Deprecated
-export { AboutMerge } from './AboutMerge';
+export { AboutOLD } from './-AboutOLD';

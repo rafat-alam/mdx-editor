@@ -1,3 +1,4 @@
+'use client'
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -10,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui2/dialog"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "./ui2/textarea"
+import { Textarea } from "../ui2/textarea"
 import {
   Select,
   SelectContent,
@@ -19,10 +20,11 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "./ui/select"
+} from "../ui/select"
 import { useState } from "react"
 import axios from "axios"
 import { toast } from "sonner"
+import { useRouter } from "next/router"
 
 interface AskAIProps {
   content: string
@@ -31,7 +33,7 @@ interface AskAIProps {
   disabled: boolean
 }
 
-export function AskAI({
+export function AskAIOLD({
   content,
   setcontent,
   setloading,
@@ -42,6 +44,7 @@ export function AskAI({
 
 
   const handleSend = async (e: React.FormEvent) => {
+    const router = useRouter();
     e.preventDefault()
 
     setloading(true)
@@ -53,13 +56,24 @@ export function AskAI({
       })
       setquery("")
 
-      if(res.status == 200) {
-        setcontent(res.data.message)
+      setcontent(res.data.message);
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+
+        if (!status) {
+          toast.error("Network error!");
+          return;
+        }
+
+        if (status === 400) toast.error(error.response?.data?.message ?? "Bad request");
+        else if (status === 401) router.push("/signin");
+        else if (status === 403) router.push("/");
+        else if (status === 404) router.push("/404");
+        else router.push("/");
       } else {
-        toast.error("Something went wrong!");
+        toast.error("Unexpected error occurred!");
       }
-    } catch {
-      toast.error("Something went wrong!");
     } finally {
       setloading(false)
     }

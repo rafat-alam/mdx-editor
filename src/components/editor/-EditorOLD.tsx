@@ -1,11 +1,11 @@
 'use client'
-import { MDXRenderer } from '@/components/mdx-renderer';
+import { MDXRendererOLD } from '@/components/editor/-MDXRendererOLD';
 import { useState, useEffect, useRef } from 'react';
 import { Textarea } from '@/components/ui2/textarea';
 import { Button } from '@/components/ui/button';
 import { Maximize2, Minimize2 } from 'lucide-react';
-import { AskAI } from '../../../components/ai-popup';
-import { Spinner } from '../../../components/ui/shadcn-io/spinner';
+import { AskAIOLD } from './-AskAIOLD';
+import { Spinner } from '../ui/shadcn-io/spinner';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -25,7 +25,7 @@ interface AxiosResponse {
   }
 }
 
-export function EditorPage({ path } : Props) {
+export function EditorOLD({ path } : Props) {
   const router = useRouter();
   const [mdxContent, setMdxContent] = useState(DEFAULT_CONTENT);
   const [isEditorFullscreen, setIsEditorFullscreen] = useState(false);
@@ -236,7 +236,7 @@ export function EditorPage({ path } : Props) {
         <div className="p-3 h-14 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
           <h2 className="text-lg font-semibold">MDX Editor</h2>
           <div className='w-32 text text-red-500 text-center'>{isAdmin || loading ? `` : `Read Only`}</div>
-          <AskAI content={mdxContent} setcontent={setMdxContent} setloading={setLoading} disabled={!isAdmin || loading}/>
+          <AskAIOLD content={mdxContent} setcontent={setMdxContent} setloading={setLoading} disabled={!isAdmin || loading}/>
           <Button variant="outline" onClick={() => {handleSave()}} disabled={saveButtonDisable || !isAdmin || loading}>Save File</Button>
           <div className="flex items-center gap-2">
             <Button
@@ -284,7 +284,7 @@ export function EditorPage({ path } : Props) {
         </div>
         <div className={`overflow-auto h-[calc(100%-3.5rem)] w-full ${isPreviewFullscreen ? 'p-6' : 'p-4'}`} ref={divRef}>
           <div className="prose prose-sm sm:prose dark:prose-invert w-full max-w-none prose-headings:text-inherit prose-p:text-inherit prose-a:text-blue-600 prose-strong:font-bold prose-em:italic prose-ul:list-disc prose-ol:list-decimal prose-li:ml-4 prose-pre:bg-gray-100 dark:prose-pre:bg-gray-800 prose-pre:p-4 prose-pre:rounded prose-pre:overflow-auto prose-code:text-red-500 prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-700 dark:prose-blockquote:text-gray-300 prose-img:max-w-full">
-            <MDXRenderer content={mdxContent} />
+            <MDXRendererOLD content={mdxContent} />
           </div>
         </div>
       </div>

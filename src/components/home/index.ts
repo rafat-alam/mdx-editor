@@ -7,4 +7,4 @@ export { HomeHeroSection } from './HomeHeroSection';
 export { HomeHowItWorksSection } from './HomeHowItWorksSection';
 
 // Deprecated
-export { HomeMerge } from './HomeMerge';
+export { HomeOLD } from './-HomeOLD';

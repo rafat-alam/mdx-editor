@@ -10,7 +10,7 @@ interface MDXRendererProps {
   content: string;
 }
 
-export function MDXRenderer({ content }: MDXRendererProps) {
+export function MDXRendererOLD({ content }: MDXRendererProps) {
   const [error, setError] = useState<string | null>(null);
 
   // Simple error boundary
