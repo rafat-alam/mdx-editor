@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { getServerSession } from 'next-auth';
 
-export async function HomePage() {
+export async function HomeMerge() {
   const session = await getServerSession(authOptions);
 
   // Show the landing page for all users, whether authenticated or not
