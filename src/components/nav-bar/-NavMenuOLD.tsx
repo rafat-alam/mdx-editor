@@ -1,11 +1,4 @@
-import * as React from "react"
-import Link from "next/link"
-
 import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
 import { SignUpButton } from "./signup-button"
@@ -15,7 +8,7 @@ import { SignOutButton } from "./signout-button"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/authoptions"
 
-export async function NavMenu() {
+export async function NavMenuOLD() {
   const session = await getServerSession(authOptions);
 
   return (
