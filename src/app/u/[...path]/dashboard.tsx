@@ -35,6 +35,10 @@ import {
   Lock,
   FileCode,
   Undo2,
+  Minimize2,
+  Maximize2,
+  HouseIcon,
+  User2,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -62,13 +66,6 @@ interface AxiosResponse1 {
   }
 }
 
-interface AxiosResponse2 {
-  status: number;
-  data: {
-    message: string;
-  }
-}
-
 export function Dashboard({ path } : Props) {
   const router = useRouter();
   const pathname = usePathname();
@@ -91,8 +88,9 @@ export function Dashboard({ path } : Props) {
   let user = useUContext();
   const [isMDXDialogOpen, setIsMDXDialogOpen] = useState(false);
   const [MDXPath, setMDXPath] = useState("");
-  const [isSeeRepoDialogOpen, setIsSeeRepoDialogOpen] = useState(false);
-  const [seeRepoUsername, setSeeRepoUsername] = useState("");
+  const [isSeeProfilesDialogOpen, setIsSeeProfilesDialogOpen] = useState(false);
+  const [seeProfilesUsername, setSeeProfilesUsername] = useState("");
+  const [mode, setMode] = useState(path.length > 1 ? 0 : 1);
 
   const handleRefresh = async () => {
     setNode(undefined);
@@ -100,19 +98,28 @@ export function Dashboard({ path } : Props) {
     try {
       const res: AxiosResponse1 = await axios.post('/api/edit/get-path', { path });
 
-      if(res.status == 200) {
-        if(res.data.list == null) {
-          router.replace('/');
-        } else {
-          setNode(res.data.list);
-        }
-      } else if(res.status == 400) {
-        toast.error(res.data.message);
-      } else {
+      if(res.data.list == null) {
         router.replace('/');
+      } else {
+        setNode(res.data.list);
       }
-    } catch {
-      router.replace('/');
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+
+        if (!status) {
+          toast.error("Network error!");
+          return;
+        }
+
+        if (status === 400) toast.error(error.response?.data?.message ?? "Bad request");
+        else if (status === 401) router.push("/signin");
+        else if (status === 403) router.push("/");
+        else if (status === 404) router.push("/404");
+        else router.push("/");
+      } else {
+        toast.error("Unexpected error occurred!");
+      }
     }
   }
 
@@ -124,20 +131,29 @@ export function Dashboard({ path } : Props) {
     setIsDeleting(true);
 
     try {
-      const res: AxiosResponse2 = await axios.post('/api/edit/remove', { path: [...path, nextChild] });
+      await axios.post('/api/edit/remove', { path: [...path, nextChild] });
 
-      if(res.status == 200) {
-        if(path.length == 1 && user && user.repo_count) {
-          user.repo_count--;
-        }
-        toast.success("Deleted Successfully!")
-      } else if(res.status == 400) {
-        toast.error(res.data.message);
-      } else {
-        router.replace('/');
+      if(path.length == 1 && user && user.repo_count) {
+        user.repo_count--;
       }
-    } catch {
-      router.replace('/');
+      toast.success("Deleted Successfully!")
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+
+        if (!status) {
+          toast.error("Network error!");
+          return;
+        }
+
+        if (status === 400) toast.error(error.response?.data?.message ?? "Bad request");
+        else if (status === 401) router.push("/signin");
+        else if (status === 403) router.push("/");
+        else if (status === 404) router.push("/404");
+        else router.push("/");
+      } else {
+        toast.error("Unexpected error occurred!");
+      }
     }
     
     setIsDeleteDialogOpen(false);
@@ -153,20 +169,29 @@ export function Dashboard({ path } : Props) {
     setIsAddingRepo(true);
 
     try {
-      const res: AxiosResponse2 = await axios.post('/api/edit/add-repo', { name: repoName });
+      await axios.post('/api/edit/add-repo', { name: repoName });
 
-      if(res.status == 200) {
-        if(user && user.repo_count) {
-          user.repo_count++;
-        }
-        toast.success("Repo Added!")
-      } else if(res.status == 400) {
-        toast.error(res.data.message);
-      } else {
-        router.replace('/');
+      if(user && user.repo_count) {
+        user.repo_count++;
       }
-    } catch {
-      router.replace('/');
+      toast.success("Repo Added!")
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+
+        if (!status) {
+          toast.error("Network error!");
+          return;
+        }
+
+        if (status === 400) toast.error(error.response?.data?.message ?? "Bad request");
+        else if (status === 401) router.push("/signin");
+        else if (status === 403) router.push("/");
+        else if (status === 404) router.push("/404");
+        else router.push("/");
+      } else {
+        toast.error("Unexpected error occurred!");
+      }
     }
     
     setIsAddRepoDialogOpen(false);
@@ -183,17 +208,25 @@ export function Dashboard({ path } : Props) {
     setIsAddingFolder(true);
 
     try {
-      const res: AxiosResponse2 = await axios.post('/api/edit/add-folder', { path, name: folderName });
+      await axios.post('/api/edit/add-folder', { path, name: folderName });
+      toast.success("Folder Added!")
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
 
-      if(res.status == 200) {
-        toast.success("Folder Added!")
-      } else if(res.status == 400) {
-        toast.error(res.data.message);
+        if (!status) {
+          toast.error("Network error!");
+          return;
+        }
+
+        if (status === 400) toast.error(error.response?.data?.message ?? "Bad request");
+        else if (status === 401) router.push("/signin");
+        else if (status === 403) router.push("/");
+        else if (status === 404) router.push("/404");
+        else router.push("/");
       } else {
-        router.replace('/');
+        toast.error("Unexpected error occurred!");
       }
-    } catch {
-      router.replace('/');
     }
     
     setIsAddFolderDialogOpen(false);
@@ -210,17 +243,25 @@ export function Dashboard({ path } : Props) {
     setIsAddingFile(true);
     
     try {
-      const res: AxiosResponse2 = await axios.post('/api/edit/add-file', { path, name: fileName + ".mdx" });
+      await axios.post('/api/edit/add-file', { path, name: fileName + ".mdx" });
+      toast.success("File Added!")
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
 
-      if(res.status == 200) {
-        toast.success("File Added!")
-      } else if(res.status == 400) {
-        toast.error(res.data.message);
+        if (!status) {
+          toast.error("Network error!");
+          return;
+        }
+
+        if (status === 400) toast.error(error.response?.data?.message ?? "Bad request");
+        else if (status === 401) router.push("/signin");
+        else if (status === 403) router.push("/");
+        else if (status === 404) router.push("/404");
+        else router.push("/");
       } else {
-        router.replace('/');
+        toast.error("Unexpected error occurred!");
       }
-    } catch {
-      router.replace('/');
     }
     
     setIsAddFileDialogOpen(false);
@@ -243,18 +284,24 @@ export function Dashboard({ path } : Props) {
     setDisableSwitch(repo.node_name);
 
     try {
-      const res: AxiosResponse2 = await axios.post('/api/edit/set-repo-vis', { name: repo.node_name, vis: checked });
+      await axios.post('/api/edit/set-repo-vis', { name: repo.node_name, vis: checked });
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
 
-      if(res.status != 200) {
-        if(res.status == 400) {
-          toast.error(res.data.message);
-        } else {
-          toast.error(res.data.message);
-          router.replace('/');
+        if (!status) {
+          toast.error("Network error!");
+          return;
         }
+
+        if (status === 400) toast.error(error.response?.data?.message ?? "Bad request");
+        else if (status === 401) router.push("/signin");
+        else if (status === 403) router.push("/");
+        else if (status === 404) router.push("/404");
+        else router.push("/");
+      } else {
+        toast.error("Unexpected error occurred!");
       }
-    } catch {
-      router.replace('/');
     }
 
     setDisableSwitch("");
@@ -270,186 +317,226 @@ export function Dashboard({ path } : Props) {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
+    <div className= {
+      mode == 1 
+      ? "w-full max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-6" 
+      : "w-screen h-[calc(100vh-4rem)] mx-auto px-2 sm:px-4 py-4 sm:py-6"}
+    >
+      { mode == 1 && <>
 
-      {/* Heading */}
-      <h1 className="text-2xl sm:text-3xl font-bold mb-2 flex items-center">
-        {!user && (
-          <>Hi, <Skeleton className="ml-2 h-10 sm:h-8 w-16 sm:w-20" /></>
-        )}
-        {user && user.email && (
-          <>Hi, {user.name}</>
-        )}
-        {user && !user.email && (
-          <>{user.name}</>
-        )}
-      </h1>
-      <div className="text-muted-foreground mb-6 sm:mb-8 text-sm sm:text-base">
-        {!user && (
-          <Skeleton className="h-8 sm:h-6 w-72 sm:w-90" />
-        )}
-        {user && user.email && (
-          <>Welcome back, Here&apos;s an overview of your activity.</>
-        )}
-        {user && !user.email && (
-          <>Welcome back, Here&apos;s an overview of {user.name}'s activity.</>
-        )}
-      </div>
+        {/* Heading */}
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2 flex items-center">
+          {!user && (
+            <>Hi, <Skeleton className="ml-2 h-10 sm:h-8 w-16 sm:w-20" /></>
+          )}
+          {user && user.email && (
+            <>Hi, {user.name}</>
+          )}
+          {user && !user.email && (
+            <>{user.name}</>
+          )}
+        </h1>
+        <div className="text-muted-foreground mb-6 sm:mb-8 text-sm sm:text-base">
+          {!user && (
+            <Skeleton className="h-8 sm:h-6 w-72 sm:w-90" />
+          )}
+          {user && user.email && (
+            <>Welcome back, Here&apos;s an overview of your activity.</>
+          )}
+          {user && !user.email && (
+            <>Welcome back, Here&apos;s an overview of {user.name}'s activity.</>
+          )}
+        </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
 
-        {/* Card No of Repositoties */}
-        <Card className="h-full bg-background">
-          <CardHeader className="pb-2 p-4 sm:p-6">
-            <CardTitle className="text-base sm:text-lg font-medium">
-              Repositories
-            </CardTitle>
-            {!user && (
-              <div className="text-xs sm:text-sm">
-                <Skeleton className="h-7 sm:h-5 w-72 sm:w-90" />
+          {/* Card No of Repositoties */}
+          <Card className="h-full bg-background">
+            <CardHeader className="pb-2 p-4 sm:p-6">
+              <CardTitle className="text-base sm:text-lg font-medium">
+                Repositories
+              </CardTitle>
+              {!user && (
+                <div className="text-xs sm:text-sm">
+                  <Skeleton className="h-7 sm:h-5 w-72 sm:w-90" />
+                </div>
+              )}
+              {user && user.email && (
+                <CardDescription className="text-xs sm:text-sm">
+                  Your saved Repositories
+                </CardDescription>
+              )}
+              {user && !user.email && (
+                <CardDescription className="text-xs sm:text-sm">
+                  {user.name}'s saved Repositories
+                </CardDescription>
+              )}
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
+              <div className="flex items-center">
+                <BookMarked className="h-6 w-6 sm:h-8 sm:w-8 text-primary mr-3" />
+                {!user ? (
+                  <Skeleton className="h-7 sm:h-9 w-16 sm:w-20" />
+                ) : (
+                  <span className="text-2xl sm:text-3xl font-bold">{user.repo_count}</span>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Card Last Active */}
+          <Card className="h-full bg-background">
+            <CardHeader className="pb-2 p-4 sm:p-6">
+              <CardTitle className="text-base sm:text-lg font-medium">
+                Last Active
+              </CardTitle>
+              {!user && (
+                <div className="text-xs sm:text-sm">
+                  <Skeleton className="h-7 sm:h-5 w-72 sm:w-90" />
+                </div>
+              )}
+              {user && user.email && (
+                <CardDescription className="text-xs sm:text-sm">
+                  Your previous session
+                </CardDescription>
+              )}
+              {user && !user.email && (
+                <CardDescription className="text-xs sm:text-sm">
+                  {user.name}'s previous session
+                </CardDescription>
+              )}
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
+              <div className="flex items-center">
+                <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-primary mr-3" />
+                {!user ? (
+                  <Skeleton className="h-7 sm:h-9 w-16 sm:w-20" />
+                ) : (
+                  <span className="text-base sm:text-lg">
+                    {user.last_active ? formatDate(user.last_active) : 'First Session'}
+                  </span>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quick Actions */}
+        <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Quick Actions</h2>
+
+        <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <Button
+            asChild 
+            variant="outline" 
+            className="h-auto py-4 sm:py-6 justify-start"
+            onClick={() => {
+              setMDXPath("");
+              setIsMDXDialogOpen(true)
+            }}
+          >
+            <div className="flex flex-col items-start">
+              <div className="flex items-center w-full">
+                <FileText className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                <span className="font-medium text-sm sm:text-base">MDX Editor</span>
+                <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-auto" />
+              </div>
+              <span className="text-xs sm:text-sm text-muted-foreground mt-1">AI-powered MDX Editing</span>
+            </div>
+          </Button>
+
+          <Button 
+            asChild 
+            variant="outline" 
+            className="h-auto py-4 sm:py-6 justify-start"
+            onClick={() => {
+              setSeeProfilesUsername("")
+              setIsSeeProfilesDialogOpen(true)
+            }}
+          >
+            <div className="flex flex-col items-start">
+              <div className="flex items-center w-full">
+                <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                <span className="font-medium text-sm sm:text-base">See Profiles...</span>
+                <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-auto" />
+              </div>
+              <span className="text-xs sm:text-sm text-muted-foreground mt-1">Search by username.</span>
+            </div>
+          </Button>
+
+          <Button asChild variant="outline" className="h-auto py-4 sm:py-6 justify-start">
+            <Link href="#" className="flex flex-col items-start">
+              <div className="flex items-center w-full">
+                <Globe className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                <span className="font-medium text-sm sm:text-base">Public Repos...</span>
+                <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-auto" />
+              </div>
+              <span className="text-xs sm:text-sm text-muted-foreground mt-1">See Public Repositories</span>
+            </Link>
+          </Button>
+
+          <Button asChild variant="outline" className="h-auto py-4 sm:py-6 justify-start">
+            <Link href="#" className="flex flex-col items-start">
+              <div className="flex items-center w-full">
+                <Layers className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                <span className="font-medium text-sm sm:text-base">Profile Settings</span>
+                <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-auto" />
+              </div>
+              <span className="text-xs sm:text-sm text-muted-foreground mt-1">Manage your account</span>
+            </Link>
+          </Button>
+        </div>
+
+        {/* Saved Repositories */}
+        <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Repositories</h2>
+      </> }
+      <Card className={mode == 1 ? 'bg-background' : 'w-full h-full flex flex-col bg-background'}>
+        <CardHeader className={mode == 1 ? "pb-2 p-4 sm:p-6" : 'pb-2 p-4 sm:p-6 shrink-0'}>
+          <div className='flex items-center justify-between'>
+            <div>
+              <CardTitle className="text-base sm:text-lg">
+                {path.length == 1 ?
+                  (!user ? `Loading Repos...` :
+                    (!user.email ? `${user?.name}'s Repos...` : `Your Repos...`)) :
+                `Inside folder : ${path[path.length - 1]}`}
+              </CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
+                Search and manage your repositories, files and folder
+              </CardDescription>
+            </div>
+            {path.length == 1 && <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setMode(1 - mode);
+                }}
+                className="h-8 w-8 p-0"
+                title={mode == 0 ? "Exit Fullscreen" : "Fullscreen"}
+              >
+                {mode == 0 ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+              </Button>
+            </div>}
+            {path.length !== 1 && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Link
+                  href={`/u/${path[0]}`}
+                  title="Go to profile"
+                  className="
+                    inline-flex items-center gap-1.5
+                    px-2 py-1 rounded-md
+                    transition-colors
+                    hover:bg-muted hover:text-foreground
+                  "
+                >
+                  <User2 size={15} className="opacity-80" />
+                  <span className="font-medium">
+                    {user ? user.name : "Loading…"}
+                  </span>
+                </Link>
               </div>
             )}
-            {user && user.email && (
-              <CardDescription className="text-xs sm:text-sm">
-                Your saved Repositories
-              </CardDescription>
-            )}
-            {user && !user.email && (
-              <CardDescription className="text-xs sm:text-sm">
-                {user.name}'s saved Repositories
-              </CardDescription>
-            )}
-          </CardHeader>
-          <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
-            <div className="flex items-center">
-              <BookMarked className="h-6 w-6 sm:h-8 sm:w-8 text-primary mr-3" />
-              {!user ? (
-                <Skeleton className="h-7 sm:h-9 w-16 sm:w-20" />
-              ) : (
-                <span className="text-2xl sm:text-3xl font-bold">{user.repo_count}</span>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Card Last Active */}
-        <Card className="h-full bg-background">
-          <CardHeader className="pb-2 p-4 sm:p-6">
-            <CardTitle className="text-base sm:text-lg font-medium">
-              Last Active
-            </CardTitle>
-            {!user && (
-              <div className="text-xs sm:text-sm">
-                <Skeleton className="h-7 sm:h-5 w-72 sm:w-90" />
-              </div>
-            )}
-            {user && user.email && (
-              <CardDescription className="text-xs sm:text-sm">
-                Your previous session
-              </CardDescription>
-            )}
-            {user && !user.email && (
-              <CardDescription className="text-xs sm:text-sm">
-                {user.name}'s previous session
-              </CardDescription>
-            )}
-          </CardHeader>
-          <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
-            <div className="flex items-center">
-              <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-primary mr-3" />
-              {!user ? (
-                <Skeleton className="h-7 sm:h-9 w-16 sm:w-20" />
-              ) : (
-                <span className="text-base sm:text-lg">
-                  {user.last_active ? formatDate(user.last_active) : 'First Session'}
-                </span>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Quick Actions */}
-      <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Quick Actions</h2>
-
-      <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-        <Button
-          asChild 
-          variant="outline" 
-          className="h-auto py-4 sm:py-6 justify-start"
-          onClick={() => {
-            setMDXPath("");
-            setIsMDXDialogOpen(true)
-          }}
-        >
-          <div className="flex flex-col items-start">
-            <div className="flex items-center w-full">
-              <FileText className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-              <span className="font-medium text-sm sm:text-base">MDX Editor</span>
-              <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-auto" />
-            </div>
-            <span className="text-xs sm:text-sm text-muted-foreground mt-1">AI-powered MDX Editing</span>
           </div>
-        </Button>
-
-        <Button 
-          asChild 
-          variant="outline" 
-          className="h-auto py-4 sm:py-6 justify-start"
-          onClick={() => {
-            setSeeRepoUsername("")
-            setIsSeeRepoDialogOpen(true)
-          }}
-        >
-          <div className="flex flex-col items-start">
-            <div className="flex items-center w-full">
-              <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-              <span className="font-medium text-sm sm:text-base">See Repos...</span>
-              <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-auto" />
-            </div>
-            <span className="text-xs sm:text-sm text-muted-foreground mt-1">Search by username.</span>
-          </div>
-        </Button>
-
-
-        <Button asChild variant="outline" className="h-auto py-4 sm:py-6 justify-start">
-          <Link href="#" className="flex flex-col items-start">
-            <div className="flex items-center w-full">
-              <Globe className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-              <span className="font-medium text-sm sm:text-base">Public Repos...</span>
-              <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-auto" />
-            </div>
-            <span className="text-xs sm:text-sm text-muted-foreground mt-1">See Public Repositories</span>
-          </Link>
-        </Button>
-
-
-        <Button asChild variant="outline" className="h-auto py-4 sm:py-6 justify-start">
-          <Link href="#" className="flex flex-col items-start">
-            <div className="flex items-center w-full">
-              <Layers className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-              <span className="font-medium text-sm sm:text-base">Profile Settings</span>
-              <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-auto" />
-            </div>
-            <span className="text-xs sm:text-sm text-muted-foreground mt-1">Manage your account</span>
-          </Link>
-        </Button>
-      </div>
-
-      {/* Saved Repositories */}
-      <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Repositories</h2>
-      <Card className='bg-background'>
-        <CardHeader className="pb-2 p-4 sm:p-6">
-          <CardTitle className="text-base sm:text-lg">
-            {path.length == 1 ?
-              (!user ? `Loading Repos...` :
-                (!user.email ? `${user?.name}'s Repos...` : `Your Repos...`)) :
-            `Inside folder : ${path[path.length - 1]}`}
-          </CardTitle>
-          <CardDescription className="text-xs sm:text-sm">
-            Search and manage your repositories, files and folder
-          </CardDescription>
           <div className="flex items-center space-x-2 mt-3 sm:mt-4">
             <div>
               <Button 
@@ -476,7 +563,7 @@ export function Dashboard({ path } : Props) {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="p-4 sm:p-6">
+        <CardContent className={mode == 1 ? "p-4 sm:p-6" : "p-4 sm:p-6 flex-1 overflow-auto"}>
           {(() => {
             if(!node || !user) {
               return <div className="space-y-2">
@@ -612,32 +699,61 @@ export function Dashboard({ path } : Props) {
             }
           })()}
         </CardContent>
-        {path.length == 1 && (
-          <CardFooter className="border-t p-4 sm:p-6">
-            <Button 
+        {path.length === 1 && (
+          <CardFooter
+            className={`
+              border-t px-4 sm:px-6 py-4
+              flex justify-center
+              ${mode === 1 ? '' : 'shrink-0'}
+            `}
+          >
+            <Button
               variant="outline"
-              className="w-full text-xs sm:text-sm mx-5"
-              onClick={() => {_handleAddRepo()}}
+              className="
+                w-full max-w-sm
+                text-sm font-medium
+                transition-all
+                hover:bg-primary hover:text-primary-foreground
+              "
+              onClick={_handleAddRepo}
               disabled={!user || !user.email}
             >
               Create New Repository
             </Button>
           </CardFooter>
         )}
+
         {path.length > 1 && (
-          <CardFooter className="border-t p-4 sm:p-6">
+          <CardFooter
+            className={`
+              border-t px-4 sm:px-6 py-4
+              flex flex-col sm:flex-row gap-3
+              ${mode === 1 ? '' : 'shrink-0'}
+            `}
+          >
             <Button
-              variant="outline" 
-              className="w-full text-xs sm:text-sm mx-5" 
-              onClick={() => {_handleAddFolder()}}
+              variant="outline"
+              className="
+                w-full
+                text-sm font-medium
+                transition-all
+                hover:bg-muted
+              "
+              onClick={_handleAddFolder}
               disabled={!user || !user.email}
             >
               Add Folder
             </Button>
-            <Button 
-              variant="outline" 
-              className="w-full text-xs sm:text-sm mx-5" 
-              onClick={() => {_handleAddFile()}}
+
+            <Button
+              variant="outline"
+              className="
+                w-full
+                text-sm font-medium
+                transition-all
+                hover:bg-primary hover:text-primary-foreground
+              "
+              onClick={_handleAddFile}
               disabled={!user || !user.email}
             >
               Add File
@@ -881,25 +997,25 @@ export function Dashboard({ path } : Props) {
         </DialogContent>
       </Dialog>
       
-      {/* See Repos... Dialog */}
-      <Dialog open={isSeeRepoDialogOpen} onOpenChange={setIsSeeRepoDialogOpen}>
+      {/* See Profiles... Dialog */}
+      <Dialog open={isSeeProfilesDialogOpen} onOpenChange={setIsSeeProfilesDialogOpen}>
         <DialogContent className="sm:max-w-md max-w-[90vw] p-4 sm:p-6">
           <DialogHeader className="space-y-2">
-            <DialogTitle className="text-lg">See Repos...</DialogTitle>
+            <DialogTitle className="text-lg">See Profiles...</DialogTitle>
             <DialogDescription className="text-sm">
-              Discover public repositories by entering a handle or username.
+              Discover public profiles by entering a handle or username.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-3">
             <Input
               type="text"
               placeholder="Enter username"
-              value={seeRepoUsername}
-              onChange={(e) => setSeeRepoUsername(e.target.value)}
+              value={seeProfilesUsername}
+              onChange={(e) => setSeeProfilesUsername(e.target.value)}
               className="pr-10 text-sm"
             />
             <div className="h-0 text-red-500 text-xs">
-              {seeRepoUsername.length === 0 || nameRegex.test(seeRepoUsername)
+              {seeProfilesUsername.length === 0 || nameRegex.test(seeProfilesUsername)
                 ? ""
                 : "Error: Username is not in valid format"}
             </div>
@@ -907,7 +1023,7 @@ export function Dashboard({ path } : Props) {
           <DialogFooter className="flex flex-col sm:flex-row justify-end gap-2">
             <Button
               variant="outline"
-              onClick={() => setIsSeeRepoDialogOpen(false)}
+              onClick={() => setIsSeeProfilesDialogOpen(false)}
               disabled={false}
               className="w-full sm:w-auto text-xs sm:text-sm"
             >
@@ -916,8 +1032,8 @@ export function Dashboard({ path } : Props) {
             <Button
               variant="default"
               onClick={() => {
-                window.open(`/r/${seeRepoUsername}`, "_blank");
-                setIsSeeRepoDialogOpen(false);
+                window.open(`/u/${seeProfilesUsername}`, "_blank");
+                setIsSeeProfilesDialogOpen(false);
               }}
               disabled={false}
               className="w-full sm:w-auto text-xs sm:text-sm"

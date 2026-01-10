@@ -4,11 +4,12 @@ import { useState, useEffect, useRef } from 'react';
 import { Textarea } from '@/components/ui2/textarea';
 import { Button } from '@/components/ui/button';
 import { Maximize2, Minimize2 } from 'lucide-react';
-import { AskAI } from './ai-popup';
-import { Spinner } from './ui/shadcn-io/spinner';
+import { AskAI } from '../../../components/ai-popup';
+import { Spinner } from '../../../components/ui/shadcn-io/spinner';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
 
 const DEFAULT_CONTENT = '# Hello, MDX!\n\nThis is a sample MDX document.\n\n```js\nconsole.log("Hello world");\n```\n\n## Features\n\n- **Bold text** and *italic text*\n- Lists and code blocks\n- And more!';
 
@@ -38,6 +39,7 @@ export function EditorPage({ path } : Props) {
   const [isAdmin, setIsAdmin] = useState(false);
   const taRef = useRef<HTMLTextAreaElement>(null);
   const divRef = useRef<HTMLDivElement>(null);
+  const { data: session, status } = useSession();
 
   const onTextareaScroll = () => {
     requestAnimationFrame(() => {
@@ -80,20 +82,31 @@ export function EditorPage({ path } : Props) {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const res: AxiosResponse = await axios.post('/api/edit/get-path', { path }, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const res: AxiosResponse = await axios.post('/api/edit/get-path', { path });
 
-        if(res.status == 200 && res.data.list == null) {
+        if(res.data.list == null) {
           setMdxContent(res.data.message);
           setIsContentArrived(true);
         } else {
           router.replace('/');
         }
-      } catch {
-        router.replace('/');
+      } catch (error: any) {
+        if (axios.isAxiosError(error)) {
+          const status = error.response?.status;
+
+          if (!status) {
+            toast.error("Network error!");
+            return;
+          }
+
+          if (status === 400) toast.error(error.response?.data?.message ?? "Bad request");
+          else if (status === 401) router.push("/signin");
+          else if (status === 403) router.push("/");
+          else if (status === 404) router.push("/404");
+          else router.push("/");
+        } else {
+          toast.error("Unexpected error occurred!");
+        }
       }
     }
 
@@ -101,49 +114,42 @@ export function EditorPage({ path } : Props) {
   }, []);
 
   useEffect(() => {
-    const fetch = async () => {
-      try {
-        const res: AxiosResponse = await axios.get(`/api/u/${path[0]}`, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if(res.status == 200 && res.data.message == "1") {
-          setIsAdmin(true);
-          setIsUserArrived(true);
-        } else if(res.status == 200 && res.data.message == "2") {
-          setIsUserArrived(true);
-        } else {
-          router.replace('/');
-        }
-      } catch {
-        router.replace('/');
+    if(status != "loading") {
+      if(status == "authenticated" && session.user.username == path[0]) {
+        setIsAdmin(true);
       }
+      if(status == "unauthenticated" || session?.user.username != path[0]) {
+        setIsAdmin(false);
+      }
+      setIsUserArrived(true);
     }
-
-    fetch();
-  }, []);
+  }, [status, session]);
 
   const handleSave = async () => {
     setSaveButtonDisable(true);
     try {
-      const res: AxiosResponse = await axios.post('/api/edit/save', { path , content: mdxContent }, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      await axios.post('/api/edit/save', { path , content: mdxContent });
 
-      if(res.status == 200) {
-        toast.success("File Saved");
-      } else if(res.status == 400) {
-        toast.error(res.data.message);
+      toast.success("File Saved!");
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+
+        if (!status) {
+          toast.error("Network error!");
+          return;
+        }
+
+        if (status === 400) toast.error(error.response?.data?.message ?? "Bad request");
+        else if (status === 401) router.push("/signin");
+        else if (status === 403) router.push("/");
+        else if (status === 404) router.push("/404");
+        else router.push("/");
       } else {
-        router.replace('/');
+        toast.error("Unexpected error occurred!");
       }
-    } catch {
-      router.replace('/');
     }
+
     setSaveButtonDisable(false);
   }
 

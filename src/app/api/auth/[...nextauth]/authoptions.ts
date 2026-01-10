@@ -112,6 +112,24 @@ export const authOptions: AuthOptions = {
       return session;
     },
   },
+  events: {
+    async signOut({ token }) {
+      console.log(token);
+      if (!token?.user_id || !token?.session_id) return;
+
+      try {
+        await fetch(
+          `${process.env.UPSTASH_REDIS_REST_URL}/del/session:${token.user_id}/${token.session_id}`, {
+            headers: {
+              Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
+            },
+          }
+        );
+      } catch {
+        throw new Error("INTERNAL SERVER ERROR!");
+      }
+    },
+  },
   pages: {
     signIn: "/signin",
   },

@@ -25,7 +25,7 @@ export async function NavMenu() {
       <div className="flex items-center space-x-4">
         <a href="/" className="text-2xl font-semibold">MDX Editor</a>
         <a href="/about" className={navigationMenuTriggerStyle()}>About</a>
-        <a href="/mdx-public" className={navigationMenuTriggerStyle()}>MDX Public</a>
+        <a href="/public-repos" className={navigationMenuTriggerStyle()}>Public Repos...</a>
       </div>
 
       {/* Right side */}

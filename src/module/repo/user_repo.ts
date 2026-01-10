@@ -55,4 +55,10 @@ export class UserRepo {
     const res = await db.select().from(user).where(eq(user.user_id, user_id));
     return res;
   }
+
+  static async get_all_user(): Promise<User []> {
+    const db = await getDB();
+    const res = await db.select().from(user);
+    return res;
+  }
 }

@@ -49,7 +49,7 @@ export async function middleware(req: NextRequest) {
     const data = await redis_res.json();
 
     if (!data.result || data.result !== token.session_id) {
-      const res = NextResponse.redirect(new URL("/signin", req.url));
+      const res = NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
       res.cookies.delete("next-auth.session-token");
       res.cookies.delete("__Secure-next-auth.session-token");
       res.cookies.delete("next-auth.csrf-token");
@@ -59,11 +59,11 @@ export async function middleware(req: NextRequest) {
   }
 
   if (needs_auth && !token) {
-    return NextResponse.redirect(new URL('/signin', req.url));
+    return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
   }
 
   if (guest_only && token) {
-    return NextResponse.redirect(new URL('/', req.url));
+    return NextResponse.json({ message: "Access Forbidden!" }, { status: 403 });
   }
 
   return NextResponse.next();

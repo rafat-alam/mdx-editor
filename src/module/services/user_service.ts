@@ -18,6 +18,15 @@ interface ResponsePublicUser {
   };
 }
 
+interface ResponseAllUser {
+  status: number;
+  message: string;
+  user_list: null | {
+    user_id: string;
+    username: string;
+  } [];
+}
+
 interface ResponsePrivateUser {
   status: number;
   message: string;
@@ -41,6 +50,21 @@ export class UserService {
       return { status: 404, message: 'No user found!', user: null };
     } catch {
       return { status: 500, message: iserror, user: null };
+    }
+  }
+
+  static async get_all_user(): Promise<ResponseAllUser> {
+    try {
+      const user: User [] = await UserRepo.get_all_user();
+
+      const filteredUsers = user.map(user => ({
+        username: user.username,
+        user_id: user.user_id,
+      }));
+
+      return { status: 200, message: success, user_list: filteredUsers };
+    } catch {
+      return { status: 500, message: iserror, user_list: null };
     }
   }
 
