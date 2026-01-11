@@ -51,7 +51,7 @@ export async function GET(
 
     const owner_id: string = res1.message;
 
-    const res2: Response = await NodeService.user_repo_count(owner_id, user_id);
+    const res2: Response = await NodeService.get_user_repo_count(owner_id, user_id);
 
     if(res2.status != 200) {
       return NextResponse.json({ message: res2.message, user: null }, { status: res2.status });

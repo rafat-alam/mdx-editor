@@ -1,5 +1,5 @@
 'use client'
-import { MDXRenderer } from '@/components/editor/-MDXRendererOLD';
+import { MDXRenderer } from '@/components/editor/MDXRenderer';
 
 interface PreviewContentProps {
   mdxContent: string;

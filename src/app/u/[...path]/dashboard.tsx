@@ -46,6 +46,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useUContext } from '../UContext';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
 
 interface _Node {
   node_name: string;
@@ -66,9 +67,20 @@ interface AxiosResponse1 {
   }
 }
 
+interface UserInterface {
+  username: string;
+  name: string;
+  email: null | string;
+  last_active: string;
+  repo_count: number;
+}
+
+
 export function Dashboard({ path } : Props) {
   const router = useRouter();
   const pathname = usePathname();
+  const { data: session, status } = useSession();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [node, setNode] = useState<_Node [] | undefined>();
   const [isDeleting, setIsDeleting] = useState(false)
@@ -85,15 +97,49 @@ export function Dashboard({ path } : Props) {
   const [repoName, setRepoName] = useState("");
   const [nextChild, setNextChild] = useState("");
   const [disableSwitch, setDisableSwitch] = useState("");
-  let user = useUContext();
+  let user: UserInterface | undefined = useUContext();
   const [isMDXDialogOpen, setIsMDXDialogOpen] = useState(false);
   const [MDXPath, setMDXPath] = useState("");
   const [isSeeProfilesDialogOpen, setIsSeeProfilesDialogOpen] = useState(false);
   const [seeProfilesUsername, setSeeProfilesUsername] = useState("");
   const [mode, setMode] = useState(path.length > 1 ? 0 : 1);
+  const [loadingContent, setLoadingContent] = useState(true);
+  const [loadingUser, setLoadingUser] = useState(true);
+  const [isContentArrived, setIsContentArrived] = useState(false);
+  const [isUserArrived, setIsUserArrived] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (isContentArrived && isUserArrived && user) {
+      setLoadingContent(false);
+    } else {
+      setLoadingContent(true);
+    }
+  }, [isContentArrived, isUserArrived, user]);
+
+  useEffect(() => {
+    if (isUserArrived && user) {
+      setLoadingUser(false);
+    } else {
+      setLoadingUser(true);
+    }
+  }, [isUserArrived, user]);
+
+  useEffect(() => {
+    if (status != "loading") {
+      if (status == "authenticated" && session.user.username == path[0]) {
+        setIsAdmin(true);
+      }
+      if (status == "unauthenticated" || session?.user.username != path[0]) {
+        setIsAdmin(false);
+      }
+      setIsUserArrived(true);
+    }
+  }, [status, session]);
 
   const handleRefresh = async () => {
     setNode(undefined);
+    setIsContentArrived(false);
     
     try {
       const res: AxiosResponse1 = await axios.post('/api/edit/get-path', { path });
@@ -101,6 +147,7 @@ export function Dashboard({ path } : Props) {
       if(res.data.list == null) {
         router.replace('/');
       } else {
+        setIsContentArrived(true);
         setNode(res.data.list);
       }
     } catch (error: any) {
@@ -326,25 +373,25 @@ export function Dashboard({ path } : Props) {
 
         {/* Heading */}
         <h1 className="text-2xl sm:text-3xl font-bold mb-2 flex items-center">
-          {!user && (
+          {loadingUser && (
             <>Hi, <Skeleton className="ml-2 h-10 sm:h-8 w-16 sm:w-20" /></>
           )}
-          {user && user.email && (
-            <>Hi, {user.name}</>
+          {!loadingUser && isAdmin && (
+            <>Hi, {user?.name}</>
           )}
-          {user && !user.email && (
-            <>{user.name}</>
+          {!loadingUser && !isAdmin && (
+            <>{user?.name}</>
           )}
         </h1>
         <div className="text-muted-foreground mb-6 sm:mb-8 text-sm sm:text-base">
-          {!user && (
+          {loadingUser && (
             <Skeleton className="h-8 sm:h-6 w-72 sm:w-90" />
           )}
-          {user && user.email && (
+          {!loadingUser && isAdmin && (
             <>Welcome back, Here&apos;s an overview of your activity.</>
           )}
-          {user && !user.email && (
-            <>Welcome back, Here&apos;s an overview of {user.name}'s activity.</>
+          {!loadingUser && !isAdmin && (
+            <>Welcome back, Here&apos;s an overview of {user?.name}'s activity.</>
           )}
         </div>
 
@@ -357,29 +404,29 @@ export function Dashboard({ path } : Props) {
               <CardTitle className="text-base sm:text-lg font-medium">
                 Repositories
               </CardTitle>
-              {!user && (
+              {loadingUser && (
                 <div className="text-xs sm:text-sm">
                   <Skeleton className="h-7 sm:h-5 w-72 sm:w-90" />
                 </div>
               )}
-              {user && user.email && (
+              {!loadingUser && isAdmin && (
                 <CardDescription className="text-xs sm:text-sm">
                   Your saved Repositories
                 </CardDescription>
               )}
-              {user && !user.email && (
+              {!loadingUser && !isAdmin && (
                 <CardDescription className="text-xs sm:text-sm">
-                  {user.name}'s saved Repositories
+                  {user?.name}'s saved Repositories
                 </CardDescription>
               )}
             </CardHeader>
             <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
               <div className="flex items-center">
                 <BookMarked className="h-6 w-6 sm:h-8 sm:w-8 text-primary mr-3" />
-                {!user ? (
+                {loadingUser ? (
                   <Skeleton className="h-7 sm:h-9 w-16 sm:w-20" />
                 ) : (
-                  <span className="text-2xl sm:text-3xl font-bold">{user.repo_count}</span>
+                  <span className="text-2xl sm:text-3xl font-bold">{user?.repo_count}</span>
                 )}
               </div>
             </CardContent>
@@ -391,30 +438,30 @@ export function Dashboard({ path } : Props) {
               <CardTitle className="text-base sm:text-lg font-medium">
                 Last Active
               </CardTitle>
-              {!user && (
+              {loadingUser && (
                 <div className="text-xs sm:text-sm">
                   <Skeleton className="h-7 sm:h-5 w-72 sm:w-90" />
                 </div>
               )}
-              {user && user.email && (
+              {!loadingUser && isAdmin && (
                 <CardDescription className="text-xs sm:text-sm">
                   Your previous session
                 </CardDescription>
               )}
-              {user && !user.email && (
+              {!loadingUser && !isAdmin && (
                 <CardDescription className="text-xs sm:text-sm">
-                  {user.name}'s previous session
+                  {user?.name}'s previous session
                 </CardDescription>
               )}
             </CardHeader>
             <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
               <div className="flex items-center">
                 <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-primary mr-3" />
-                {!user ? (
+                {loadingUser ? (
                   <Skeleton className="h-7 sm:h-9 w-16 sm:w-20" />
                 ) : (
                   <span className="text-base sm:text-lg">
-                    {user.last_active ? formatDate(user.last_active) : 'First Session'}
+                    {user?.last_active ? formatDate(user.last_active) : 'First Session'}
                   </span>
                 )}
               </div>
@@ -464,26 +511,34 @@ export function Dashboard({ path } : Props) {
             </div>
           </Button>
 
-          <Button asChild variant="outline" className="h-auto py-4 sm:py-6 justify-start">
-            <Link href="#" className="flex flex-col items-start">
+          <Button 
+            asChild 
+            variant="outline" 
+            className="h-auto py-4 sm:py-6 justify-start"
+          >
+            <a href="/public-repos" className="flex flex-col items-start">
               <div className="flex items-center w-full">
                 <Globe className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                 <span className="font-medium text-sm sm:text-base">Public Repos...</span>
                 <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-auto" />
               </div>
               <span className="text-xs sm:text-sm text-muted-foreground mt-1">See Public Repositories</span>
-            </Link>
+            </a>
           </Button>
 
-          <Button asChild variant="outline" className="h-auto py-4 sm:py-6 justify-start">
-            <Link href="#" className="flex flex-col items-start">
+          <Button 
+            asChild 
+            variant="outline" 
+            className="h-auto py-4 sm:py-6 justify-start"
+          >
+            <a href="/settings" className="flex flex-col items-start">
               <div className="flex items-center w-full">
                 <Layers className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                 <span className="font-medium text-sm sm:text-base">Profile Settings</span>
                 <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-auto" />
               </div>
               <span className="text-xs sm:text-sm text-muted-foreground mt-1">Manage your account</span>
-            </Link>
+            </a>
           </Button>
         </div>
 
@@ -496,8 +551,8 @@ export function Dashboard({ path } : Props) {
             <div>
               <CardTitle className="text-base sm:text-lg">
                 {path.length == 1 ?
-                  (!user ? `Loading Repos...` :
-                    (!user.email ? `${user?.name}'s Repos...` : `Your Repos...`)) :
+                  (loadingContent ? `Loading Repos...` :
+                    (!isAdmin ? `${user?.name}'s Repos...` : `Your Repos...`)) :
                 `Inside folder : ${path[path.length - 1]}`}
               </CardTitle>
               <CardDescription className="text-xs sm:text-sm">
@@ -531,7 +586,7 @@ export function Dashboard({ path } : Props) {
                 >
                   <User2 size={15} className="opacity-80" />
                   <span className="font-medium">
-                    {user ? user.name : "Loading…"}
+                    {loadingUser ? "Loading…" : user?.name}
                   </span>
                 </Link>
               </div>
@@ -565,7 +620,7 @@ export function Dashboard({ path } : Props) {
         </CardHeader>
         <CardContent className={mode == 1 ? "p-4 sm:p-6" : "p-4 sm:p-6 flex-1 overflow-auto"}>
           {(() => {
-            if(!node || !user) {
+            if(loadingContent) {
               return <div className="space-y-2">
                 {[...Array(3)].map((_, i) => (
                   <Skeleton key={i} className="h-12 w-full" />
@@ -573,13 +628,13 @@ export function Dashboard({ path } : Props) {
               </div>
             }
 
-            const filteredItems = node.filter(item =>
+            const filteredItems = node?.filter(item =>
               item.node_name.toLowerCase().includes(searchQuery.trim().toLowerCase())
             );
 
-            if(filteredItems.length > 0) {
+            if(filteredItems?.length! > 0) {
               return <div className="space-y-4">
-                {filteredItems.map((repo) => (
+                {filteredItems?.map((repo) => (
                   <div key={repo.node_name} className="flex flex-col sm:flex-row sm:items-start sm:justify-between border-b pb-3 last:border-0 gap-2 sm:gap-0">
                     <div className="max-w-full sm:max-w-[60%]">
                       <h3 className="font-medium text-sm sm:text-base truncate">{repo.node_name}</h3>
@@ -595,7 +650,7 @@ export function Dashboard({ path } : Props) {
                       </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-1 sm:gap-2 mt-1 sm:mt-0 justify-between sm:justify-end">
-                      {path.length == 1 && user.email && <div className="flex items-center">
+                      {path.length == 1 && isAdmin && <div className="flex items-center">
                         <div className="flex items-center space-x-1 sm:space-x-2">
                           <Switch
                             id={`public-toggle-${repo.node_name}`}
@@ -651,7 +706,7 @@ export function Dashboard({ path } : Props) {
                             setNextChild(repo.node_name);
                             _handleDelete();
                           }}
-                          disabled={!user || !user.email}
+                          disabled={!isAdmin}
                         >
                           <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
@@ -680,7 +735,7 @@ export function Dashboard({ path } : Props) {
                 <div>
                   <p className="text-muted-foreground mb-3 sm:mb-4 text-sm">
                     {(() => {
-                      const owner = user.email ? "You" : user.name;
+                      const owner = isAdmin ? "You" : user?.name;
                       const isRoot = path.length === 1;
                       return isRoot
                         ? `${owner} haven't created any repository yet`
@@ -690,7 +745,7 @@ export function Dashboard({ path } : Props) {
                   {path.length == 1 && <Button 
                     className="text-xs sm:text-sm"
                     onClick={() => {_handleAddRepo()}}
-                    disabled={!user || !user.email}
+                    disabled={!isAdmin}
                   >
                     Create Your Repository
                   </Button>}
@@ -716,7 +771,7 @@ export function Dashboard({ path } : Props) {
                 hover:bg-primary hover:text-primary-foreground
               "
               onClick={_handleAddRepo}
-              disabled={!user || !user.email}
+              disabled={!isAdmin}
             >
               Create New Repository
             </Button>
@@ -740,7 +795,7 @@ export function Dashboard({ path } : Props) {
                 hover:bg-muted
               "
               onClick={_handleAddFolder}
-              disabled={!user || !user.email}
+              disabled={!isAdmin}
             >
               Add Folder
             </Button>
@@ -754,7 +809,7 @@ export function Dashboard({ path } : Props) {
                 hover:bg-primary hover:text-primary-foreground
               "
               onClick={_handleAddFile}
-              disabled={!user || !user.email}
+              disabled={!isAdmin}
             >
               Add File
             </Button>
