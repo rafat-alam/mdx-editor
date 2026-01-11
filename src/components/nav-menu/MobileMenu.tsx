@@ -3,9 +3,9 @@ import { useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { navigationMenuTriggerStyle } from '@/components/ui/navigation-menu'
-import { SignOutButton } from './signout-button'
-import { SignInButton } from './signin-button'
-import { SignUpButton } from './signup-button'
+import { SignOutButton } from './SignoutButton'
+import { SignInButton } from './SigninButton'
+import { SignUpButton } from './SignupButton'
 
 interface MobileMenuProps {
   session: any

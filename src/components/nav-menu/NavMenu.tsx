@@ -3,11 +3,11 @@ import {
 } from "@/components/ui/navigation-menu"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/authoptions"
-import { ThemeButton } from "./theme-button";
-import { SignUpButton } from "./signup-button";
-import { SignInButton } from "./signin-button";
-import { SignOutButton } from "./signout-button";
-import { MobileMenu } from "./MobileMenu-Alternative";
+import { ThemeButton } from "./ThemeButton";
+import { SignUpButton } from "./SignupButton";
+import { SignInButton } from "./SigninButton";
+import { SignOutButton } from "./SignoutButton";
+import { MobileMenu } from "./MobileMenu";
 
 export async function NavMenu() {
   const session = await getServerSession(authOptions);

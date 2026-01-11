@@ -1,10 +1,10 @@
 import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
-import { SignUpButton } from "./signup-button"
-import { SignInButton } from "./signin-button"
-import { ThemeButton } from "./theme-button"
-import { SignOutButton } from "./signout-button"
+import { SignUpButton } from "./SignupButton"
+import { SignInButton } from "./SigninButton"
+import { ThemeButton } from "./ThemeButton"
+import { SignOutButton } from "./SignoutButton"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/authoptions"
 
