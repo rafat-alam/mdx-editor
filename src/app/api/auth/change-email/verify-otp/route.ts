@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'User not authenticated!' }, { status: 498 });
     }
 
-    const res: Response = await AuthService.forgot_pass_or_change_email_verify_otp(token, otp);
+    const res: Response = await AuthService.verify_reset_otp(token, otp);
 
     return NextResponse.json({ message: res.message }, { status: res.status });
   } catch {

@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     
     if (!email) return NextResponse.json({ message: 'Email required!' }, { status: 400 });
 
-    const res: Response = await AuthService.init_forgot_pass(email);
+    const res: Response = await AuthService.init_forgot_password(email);
 
     return NextResponse.json({ message: res.message }, { status: res.status });
   } catch {

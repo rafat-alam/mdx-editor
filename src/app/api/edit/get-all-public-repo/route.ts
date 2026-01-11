@@ -20,13 +20,13 @@ interface ResponseAllUser {
 
 export async function GET() {
   try {
-    const res1: ResponseList = await NodeService.get_all_public_repo();
+    const res1: ResponseList = await NodeService.get_all_public_repos();
 
     if(res1.status != 200) {
       return NextResponse.json({ message: res1.message, list: null }, { status: res1.status });
     }
 
-    const res2: ResponseAllUser = await UserService.get_all_user();
+    const res2: ResponseAllUser = await UserService.get_all_users();
 
     if(res2.status != 200) {
       return NextResponse.json({ message: res2.message, list: null }, { status: res2.status });

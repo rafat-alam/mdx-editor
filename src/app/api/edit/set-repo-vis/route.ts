@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
 
     const repo_id: string = res1.message;
 
-    const res2: Response = await NodeService.set_repo_vis(repo_id, token.user_id, vis);
+    const res2: Response = await NodeService.set_repo_visibility(repo_id, token.user_id, vis);
 
     return NextResponse.json({ message: res2.message }, { status: res2.status });
   } catch {

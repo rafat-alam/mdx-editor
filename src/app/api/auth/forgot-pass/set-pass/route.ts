@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Password is not in valid format!' }, { status: 400 });
     }
 
-    const res: Response = await AuthService.set_pass(token, password);
+    const res: Response = await AuthService.set_password(token, password);
 
     return NextResponse.json({ message: res.message }, { status: res.status });
   } catch {

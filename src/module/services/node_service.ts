@@ -10,256 +10,291 @@ interface Response {
 interface ResponseList {
   status: number;
   message: string;
-  list: null | _Node [];
+  list: _Node[] | null;
 }
 
-const iserror: string = "INTERNAL SERVER ERROR!";
-const success: string = "OK!";
+const INTERNAL_SERVER_ERROR = "INTERNAL SERVER ERROR!";
+const SUCCESS = "OK!";
+const ACCESS_FORBIDDEN = "Access Forbidden!";
+const PAGE_NOT_FOUND = "Page Not Found!";
 
 export class NodeService {
+  private static async validate_parent_folder(parent_id: string, user_id: string): Promise<Response | null> {
+    if (await NodeRepo.is_parent_not_folder(parent_id, user_id)) {
+      return { status: 403, message: ACCESS_FORBIDDEN };
+    }
+    return null;
+  }
+
+  private static async validate_name_uniqueness(parent_id: string, node_name: string, error_message: string): Promise<Response | null> {
+    if (await NodeRepo.is_name_already_present(parent_id, node_name)) {
+      return { status: 400, message: error_message };
+    }
+    return null;
+  }
+
   static async add_repo(node_name: string, user_id: string): Promise<Response> {
     try {
-      if(await NodeRepo.is_name_already_present(user_id, node_name)) {
-        return { status: 400, message: 'Repo with same name already Present!' };
-      }
+      const name_error = await this.validate_name_uniqueness(
+        user_id,
+        node_name,
+        'Repo with same name already present!'
+      );
+      if (name_error) return name_error;
 
       const node_id = v4();
       const node = new _Node(node_id, node_name, 'FOLDER', false, null, user_id, user_id);
       await NodeRepo.add_node(node);
-      return { status: 200, message: success };
+      
+      return { status: 200, message: SUCCESS };
     } catch {
-      return { status: 500, message: iserror };
+      return { status: 500, message: INTERNAL_SERVER_ERROR };
     }
   }
 
   static async add_folder(node_name: string, user_id: string, parent_id: string): Promise<Response> {
     try {
-      if(await NodeRepo.is_parent_not_folder(parent_id, user_id)) {
-        return { status: 403, message: 'Access Forbidden!' };
-      }
+      const parent_error = await this.validate_parent_folder(parent_id, user_id);
+      if (parent_error) return parent_error;
 
-      if(await NodeRepo.is_name_already_present(parent_id, node_name)) {
-        return { status: 400, message: 'File or Folder with same name already Present!' };
-      }
+      const name_error = await this.validate_name_uniqueness(
+        parent_id,
+        node_name,
+        'File or folder with same name already present!'
+      );
+      if (name_error) return name_error;
 
       const node_id = v4();
       const node = new _Node(node_id, node_name, 'FOLDER', null, null, user_id, parent_id);
       await NodeRepo.add_node(node);
-      return { status: 200, message: success };
+      
+      return { status: 200, message: SUCCESS };
     } catch {
-      return { status: 500, message: iserror };
+      return { status: 500, message: INTERNAL_SERVER_ERROR };
     }
   }
 
   static async add_file(node_name: string, content: string, user_id: string, parent_id: string): Promise<Response> {
     try {
-      if(await NodeRepo.is_parent_not_folder(parent_id, user_id)) {
-        return { status: 403, message: 'Access Forbidden!' };
-      }
+      const parent_error = await this.validate_parent_folder(parent_id, user_id);
+      if (parent_error) return parent_error;
 
-      if(await NodeRepo.is_name_already_present(parent_id, node_name)) {
-        return { status: 400, message: 'File or Folder with same name already Present!' };
-      }
+      const name_error = await this.validate_name_uniqueness(
+        parent_id,
+        node_name,
+        'File or folder with same name already present!'
+      );
+      if (name_error) return name_error;
 
       const node_id = v4();
       const node = new _Node(node_id, node_name, 'FILE', null, content, user_id, parent_id);
       await NodeRepo.add_node(node);
-      return { status: 200, message: success };
+      
+      return { status: 200, message: SUCCESS };
     } catch {
-      return { status: 500, message: iserror };
+      return { status: 500, message: INTERNAL_SERVER_ERROR };
     }
   }
 
   static async rename_repo(repo_id: string, new_name: string, user_id: string): Promise<Response> {
     try {
-      if(await NodeRepo.is_repo_owner(repo_id, user_id)) {
-        return { status: 403, message: 'Access Forbidden!' };
-      }
-      if(await NodeRepo.is_name_already_present(user_id, new_name)) {
-        return { status: 400, message: 'Repo with same name already Present!' };
+      if (await NodeRepo.is_repo_owner(repo_id, user_id)) {
+        return { status: 403, message: ACCESS_FORBIDDEN };
       }
 
-      await NodeRepo.update_time(repo_id);
+      const name_error = await this.validate_name_uniqueness(
+        user_id,
+        new_name,
+        'Repo with same name already present!'
+      );
+      if (name_error) return name_error;
+
+      await NodeRepo.update_timestamp(repo_id);
       await NodeRepo.rename(repo_id, new_name);
 
-      return { status: 200, message: success };
+      return { status: 200, message: SUCCESS };
     } catch {
-      return { status: 500, message: iserror };
+      return { status: 500, message: INTERNAL_SERVER_ERROR };
     }
   }
 
   static async rename(parent_id: string, node_id: string, new_name: string, user_id: string): Promise<Response> {
     try {
-      if(await NodeRepo.is_parent_not_folder(parent_id, user_id)) {
-        return { status: 403, message: 'Access Forbidden!' };
-      }
+      const parent_error = await this.validate_parent_folder(parent_id, user_id);
+      if (parent_error) return parent_error;
 
-      if(await NodeRepo.is_name_already_present(parent_id, new_name)) {
-        return { status: 400, message: 'File or Folder with same name already Present!' };
-      }
+      const name_error = await this.validate_name_uniqueness(
+        parent_id,
+        new_name,
+        'File or folder with same name already present!'
+      );
+      if (name_error) return name_error;
 
-      await NodeRepo.update_time(node_id);
+      await NodeRepo.update_timestamp(node_id);
       await NodeRepo.rename(node_id, new_name);
 
-      return { status: 200, message: success };
+      return { status: 200, message: SUCCESS };
     } catch {
-      return { status: 500, message: iserror };
+      return { status: 500, message: INTERNAL_SERVER_ERROR };
     }
   }
 
   static async save(node_id: string, new_content: string, user_id: string): Promise<Response> {
     try {
-      if(await NodeRepo.is_file_present(node_id, user_id)) {
-        return { status: 403, message: 'Access Forbidden!' };
+      if (await NodeRepo.is_file_present(node_id, user_id)) {
+        return { status: 403, message: ACCESS_FORBIDDEN };
       }
 
-      await NodeRepo.update_time(node_id);
+      await NodeRepo.update_timestamp(node_id);
       await NodeRepo.save(node_id, new_content);
 
-      return { status: 200, message: success };
+      return { status: 200, message: SUCCESS };
     } catch {
-      return { status: 500, message: iserror };
+      return { status: 500, message: INTERNAL_SERVER_ERROR };
     }
   }
 
   static async remove(node_id: string, user_id: string): Promise<Response> {
     try {
-      let res: _Node = await NodeRepo.get_node(node_id);
+      const node = await NodeRepo.get_node(node_id);
 
-      if(res.owner_id != user_id) {
-        return { status: 403, message: 'Access Forbidden!' };
+      if (node.owner_id !== user_id) {
+        return { status: 403, message: ACCESS_FORBIDDEN };
       }
 
-      let list: string [] = [node_id];
-      while(list.length) {
-        let temp: string [] = [];
-        for (const l of list) {
-          let curr: _Node [] = await NodeRepo.remove_by_node_id(l);
-          for (const e of curr) {
-            temp.push(e.node_id);
+      let nodes_to_delete: string[] = [node_id];
+      
+      while (nodes_to_delete.length > 0) {
+        const children_to_delete: string[] = [];
+        
+        for (const current_node_id of nodes_to_delete) {
+          const children = await NodeRepo.remove_by_node_id(current_node_id);
+          for (const child of children) {
+            children_to_delete.push(child.node_id);
           }
         }
-        list = temp;
-      }
-      return { status: 200, message: success };
-    } catch {
-      return { status: 500, message: iserror };
-    }
-  }
-
-  static async set_repo_vis(repo_id: string, user_id: string, vis: boolean): Promise<Response> {
-    try {
-      if(await NodeRepo.is_repo_owner(repo_id, user_id)) {
-        return { status: 403, message: 'Access Forbidden!' };
-      }
-      await NodeRepo.update_time(repo_id);
-      await NodeRepo.set_repo_vis(repo_id, vis);
-      return { status: 200, message: success };
-    } catch {
-      return { status: 500, message: iserror };
-    }
-  }
-
-  static async get_content_by_link(link: string [], owner_id: string, user_id: string): Promise<ResponseList> {
-    try {
-      let list: _Node [] = await NodeRepo.get_repo_list(owner_id);
-      if(owner_id == user_id) {
-        list = await NodeRepo.get_repo_list(owner_id);
-      } else {
-        list = await NodeRepo.get_public_repo_list(owner_id);
+        
+        nodes_to_delete = children_to_delete;
       }
       
-      let content: null | string = null;
+      return { status: 200, message: SUCCESS };
+    } catch {
+      return { status: 500, message: INTERNAL_SERVER_ERROR };
+    }
+  }
 
-      for(let i = 0; i < link.length; i++) {
-        let next_folder_id: null | string = null;
-        for(const dir of list) {
-          if(dir.node_name == link[i]) {
-            next_folder_id = dir.node_id;
+  static async set_repo_visibility(repo_id: string, user_id: string, is_public: boolean): Promise<Response> {
+    try {
+      if (await NodeRepo.is_repo_owner(repo_id, user_id)) {
+        return { status: 403, message: ACCESS_FORBIDDEN };
+      }
+      
+      await NodeRepo.update_timestamp(repo_id);
+      await NodeRepo.set_repo_visibility(repo_id, is_public);
+      
+      return { status: 200, message: SUCCESS };
+    } catch {
+      return { status: 500, message: INTERNAL_SERVER_ERROR };
+    }
+  }
+
+  static async get_content_by_link(link: string[], owner_id: string, user_id: string): Promise<ResponseList> {
+    try {
+      let node_list = owner_id === user_id
+        ? await NodeRepo.get_repo_list(owner_id)
+        : await NodeRepo.get_public_repo_list(owner_id);
+
+      let file_content: string | null = null;
+
+      for (let i = 0; i < link.length; i++) {
+        let next_folder_id: string | null = null;
+        
+        for (const node of node_list) {
+          if (node.node_name === link[i]) {
+            next_folder_id = node.node_id;
+            break;
           }
         }
 
-        if(next_folder_id == null) {
-          if(content != null) {
-            return { status: 200, message: content, list: null };
-          } else {
-            return { status: 404, message: 'Page Not Found!', list: null };
+        if (next_folder_id === null) {
+          if (file_content !== null) {
+            return { status: 200, message: file_content, list: null };
           }
+          return { status: 404, message: PAGE_NOT_FOUND, list: null };
         }
 
-        list = await NodeRepo.get_folder_list(next_folder_id);
+        node_list = await NodeRepo.get_folder_list(next_folder_id);
 
-        if(i < link.length - 1) {
-          for(const li of list) {
-            if(li.node_name == link[i + 1]) {
-              content = li.content;
+        if (i < link.length - 1) {
+          for (const node of node_list) {
+            if (node.node_name === link[i + 1]) {
+              file_content = node.content;
+              break;
             }
           }
         }
       }
 
-      if(content == null) {
-        return { status: 200, message: success, list: list };
-      } else {
-        return { status: 200, message: content, list: null };
+      if (file_content === null) {
+        return { status: 200, message: SUCCESS, list: node_list };
       }
+      
+      return { status: 200, message: file_content, list: null };
     } catch {
-      return { status: 500, message: iserror, list: null };
+      return { status: 500, message: INTERNAL_SERVER_ERROR, list: null };
     }
   }
 
-  static async get_node_id_by_link(link: string [], owner_id: string, user_id: string): Promise<Response> {
+  static async get_node_id_by_link(link: string[], owner_id: string, user_id: string): Promise<Response> {
     try {
-      let list: _Node [];
-      if(owner_id == user_id) {
-        list = await NodeRepo.get_repo_list(owner_id);
-      } else {
-        list = await NodeRepo.get_public_repo_list(owner_id);
-      }
-      
+      let node_list = owner_id === user_id
+        ? await NodeRepo.get_repo_list(owner_id)
+        : await NodeRepo.get_public_repo_list(owner_id);
+
       let parent_id: string = owner_id;
 
-      for(const l of link) {
-        let next_folder_id: null | string = null;
-        for(const dir of list) {
-          if(dir.node_name == l) {
-            next_folder_id = dir.node_id
+      for (const link_segment of link) {
+        let next_folder_id: string | null = null;
+        
+        for (const node of node_list) {
+          if (node.node_name === link_segment) {
+            next_folder_id = node.node_id;
+            break;
           }
         }
 
-        if(next_folder_id == null) {
-          return { status: 404, message: 'Page Not Found!' };
+        if (next_folder_id === null) {
+          return { status: 404, message: PAGE_NOT_FOUND };
         }
 
         parent_id = next_folder_id;
-        list = await NodeRepo.get_folder_list(next_folder_id);
+        node_list = await NodeRepo.get_folder_list(next_folder_id);
       }
 
       return { status: 200, message: parent_id };
     } catch {
-      return { status: 500, message: iserror };
+      return { status: 500, message: INTERNAL_SERVER_ERROR };
     }
   }
 
-  static async user_repo_count(owner_id: string, user_id: string): Promise<Response> {
+  static async get_user_repo_count(owner_id: string, user_id: string): Promise<Response> {
     try {
-      if(owner_id == user_id) {
-        return { status: 200, message: (await NodeRepo.get_repo_list(owner_id)).length.toString() };
-      } else {
-        return { status: 200, message: (await NodeRepo.get_public_repo_list(owner_id)).length.toString() };
-      }
+      const repo_list = owner_id === user_id
+        ? await NodeRepo.get_repo_list(owner_id)
+        : await NodeRepo.get_public_repo_list(owner_id);
+
+      return { status: 200, message: repo_list.length.toString() };
     } catch {
-      return { status: 500, message: iserror };
+      return { status: 500, message: INTERNAL_SERVER_ERROR };
     }
   }
 
-  static async get_all_public_repo(): Promise<ResponseList> {
+  static async get_all_public_repos(): Promise<ResponseList> {
     try {
-      let list: _Node [] = await NodeRepo.get_all_public_repo();
-
-      return { status: 200, message: success, list: list };
+      const repo_list = await NodeRepo.get_all_public_repos();
+      return { status: 200, message: SUCCESS, list: repo_list };
     } catch {
-      return { status: 500, message: iserror, list: null };
+      return { status: 500, message: INTERNAL_SERVER_ERROR, list: null };
     }
   }
 }
