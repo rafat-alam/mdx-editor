@@ -17,11 +17,11 @@ import { AppDispatch } from "@/store/store"
 import { setLoading3 } from "@/store/authSlice"
 import { toast } from "sonner"
 
-export function SignInForm({
+export function SignInFormOLD({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [email_username, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch<AppDispatch>()
   
@@ -29,7 +29,7 @@ export function SignInForm({
     e.preventDefault();
     dispatch(setLoading3(true));
     const res = await signIn('credentials', {
-      identifier: email_username.trim().toLowerCase(),
+      identifier: identifier.trim().toLowerCase(),
       password: password.trim(),
       redirect: false,
     });
@@ -87,8 +87,8 @@ export function SignInForm({
                     id="email"
                     type="text"
                     placeholder="user@email.com or user"
-                    value={email_username}
-                    onChange={e => setEmail(e.target.value)}
+                    value={identifier}
+                    onChange={e => setIdentifier(e.target.value)}
                     required
                   />
                 </div>
