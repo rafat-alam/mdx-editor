@@ -43,7 +43,7 @@ import {
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useUContext } from '../UContext';
+import { useUContext } from '../../app/u/UContext';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
@@ -76,7 +76,7 @@ interface UserInterface {
 }
 
 
-export function Dashboard({ path } : Props) {
+export function DashboardOLD({ path } : Props) {
   const router = useRouter();
   const pathname = usePathname();
   const { data: session, status } = useSession();

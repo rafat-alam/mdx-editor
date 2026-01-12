@@ -1,4 +1,5 @@
-"use client"
+"use client";
+
 import { createContext, useContext } from "react";
 
 interface UserInterface {
@@ -9,10 +10,8 @@ interface UserInterface {
   repo_count: number;
 }
 
-
 export const UContext = createContext<UserInterface | undefined>(undefined);
 
 export function useUContext() {
-  const ctx = useContext(UContext);
-  return ctx;
+  return useContext(UContext);
 }

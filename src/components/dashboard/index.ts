@@ -1,0 +1,16 @@
+export { Dashboard } from './Dashboard'
+export { AddFileDialog } from './AddFileDialog'
+export { AddFolderDialog } from './AddFolderDialog'
+export { AddRepoDialog } from './AddRepoDialog'
+export { DashboardHeader } from './DashboardHeader'
+export { DeleteDialog } from './DeleteDialog'
+export { MDXEditorDialog } from './MDXEditorDialog'
+export { QuickActions } from './QuickActions'
+export { RepositoriesCard } from './RepositoriesCard'
+export { RepositoryList } from './RepositoryList'
+export { SeeProfilesDialog } from './SeeProfilesDialog'
+export { StatsOverview } from './StatsOverview'
+
+// Deprecated
+export { DashboardOLD } from './-DashboardOLD'
+

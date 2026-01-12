@@ -1,10 +1,10 @@
 "use client";
+
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { UContext } from "./UContext";
+import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { UContext } from "./UContext";
 
 interface UserInterface {
   username: string;
@@ -14,31 +14,24 @@ interface UserInterface {
   repo_count: number;
 }
 
-interface AxiosResponse {
+interface UserApiResponse {
   status: number;
   data: {
     message: string;
     user: null | UserInterface;
-  }
+  };
 }
 
-export default function ULayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ULayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const params = useParams<{ path: string[] }>();
-
   const [user, setUser] = useState<UserInterface | undefined>(undefined);
 
   useEffect(() => {
-    const load = async () => {
-    
+    const loadUser = async () => {
       try {
-        const res: AxiosResponse = await axios.get(`/api/u/${params.path[0]}`);
-
-        setUser(res.data.user!);
+        const response: UserApiResponse = await axios.get(`/api/u/${params.path[0]}`);
+        setUser(response.data.user!);
       } catch (error: any) {
         if (axios.isAxiosError(error)) {
           const status = error.response?.status;
@@ -58,13 +51,9 @@ export default function ULayout({
         }
       }
     };
-    
-    load();
-  }, []);
 
-  return (
-    <UContext.Provider value={ user }>
-      {children}
-    </UContext.Provider>
-  );
+    loadUser();
+  }, [params.path, router]);
+
+  return <UContext.Provider value={user}>{children}</UContext.Provider>;
 }
