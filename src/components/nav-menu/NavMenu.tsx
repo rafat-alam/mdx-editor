@@ -4,9 +4,9 @@ import {
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/authoptions"
 import { ThemeButton } from "./ThemeButton";
-import { SignUpButton } from "./SignupButton";
-import { SignInButton } from "./SigninButton";
-import { SignOutButton } from "./SignoutButton";
+import { SignUpButton } from "./SignUpButton";
+import { SignInButton } from "./SignInButton";
+import { SignOutButton } from "./SignOutButton";
 import { MobileMenu } from "./MobileMenu";
 
 export async function NavMenu() {

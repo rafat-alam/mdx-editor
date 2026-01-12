@@ -17,6 +17,6 @@ export { useEditorContent } from './useEditorContent';
 export { useMobileView } from './useMobileView';
 
 // Deprecated
-export { AskAIOLD } from './-AskAIOLD';
-export { EditorOLD } from './-EditorOLD';
-export { MDXRendererOLD } from './-MDXRendererOLD';
+// export { AskAIOLD } from './-AskAIOLD';
+// export { EditorOLD } from './-EditorOLD';
+// export { MDXRendererOLD } from './-MDXRendererOLD';

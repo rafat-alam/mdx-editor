@@ -12,5 +12,5 @@ export { SeeProfilesDialog } from './SeeProfilesDialog'
 export { StatsOverview } from './StatsOverview'
 
 // Deprecated
-export { DashboardOLD } from './-DashboardOLD'
+// export { DashboardOLD } from './-DashboardOLD'
 

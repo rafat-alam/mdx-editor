@@ -11,35 +11,60 @@
 // import { Input } from "@/components/ui2/input"
 // import { Label } from "@/components/ui/label"
 // import { useState } from "react"
-// import { signIn } from "next-auth/react"
+// import { useRouter } from "next/navigation"
+// import axios from "axios"
 // import { useDispatch } from "react-redux"
 // import { AppDispatch } from "@/store/store"
-// import { setLoading3 } from "@/store/authSlice"
+// import { setSignUpLoading1, setSignUpToken } from "@/store/authSlice"
 // import { toast } from "sonner"
 
-// export function SignInFormOLD({
+// export function SignUpFormOLD({
 //   className,
 //   ...props
 // }: React.ComponentProps<"div">) {
-//   const [identifier, setIdentifier] = useState('');
+//   const [email, setEmail] = useState('');
+//   const [username, setUsername] = useState('');
 //   const [password, setPassword] = useState('');
+//   const router = useRouter();
 //   const dispatch = useDispatch<AppDispatch>()
-  
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-//     dispatch(setLoading3(true));
-//     const res = await signIn('credentials', {
-//       identifier: identifier.trim().toLowerCase(),
-//       password: password.trim(),
-//       redirect: false,
-//     });
 
-//     if (res?.ok) {
-//       toast.success("Welcome!");
-//       window.location.href = '/';
-//     } else {
-//       dispatch(setLoading3(false));
-//       toast.error(res?.error || 'Signin failed!');
+//   const handleSignup = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     setSignUpToken("");
+//     dispatch(setSignUpLoading1(true));
+
+//     try {
+//       const res = await axios.post('/api/auth/signup/send-otp', {
+//         name: "Rafat",
+//         email: email.trim().toLowerCase(),
+//         username: username.trim().toLowerCase(),
+//         password: password.trim(),
+//       });
+
+//       dispatch(setSignUpToken(res.data.message));
+//       toast.success("OTP Send!");
+//       router.push('/signup/verify');
+//     } catch (error: any) {
+//       if (axios.isAxiosError(error)) {
+//         const status = error.response?.status;
+
+//         if (!status) {
+//           toast.error("Network error!");
+//           return;
+//         }
+
+//         if (status === 400) toast.error(error.response?.data?.message ?? "Bad request");
+//         else if (status === 401) router.push("/signin");
+//         else if (status === 403) router.push("/");
+//         else if (status === 404) router.push("/404");
+//         else router.push("/");
+//       } else {
+//         toast.error("Unexpected error occurred!");
+//       }
+
+//       dispatch(setSignUpToken(""));
+//     } finally {
+//       dispatch(setSignUpLoading1(false));
 //     }
 //   };
 
@@ -47,13 +72,13 @@
 //     <div className={cn("flex flex-col gap-6", className)} {...props}>
 //       <Card className="bg-background">
 //         <CardHeader className="text-center">
-//           <CardTitle className="text-xl">Welcome back</CardTitle>
+//           <CardTitle className="text-xl">Hi, there </CardTitle>
 //           <CardDescription>
-//             SignIn with your Apple or Google account
+//             Register with your Apple or Google account
 //           </CardDescription>
 //         </CardHeader>
 //         <CardContent>
-//           <form onSubmit={handleSubmit}>
+//           <form onSubmit={(e) => handleSignup(e)}>
 //             <div className="grid gap-6">
 //               <div className="flex flex-col gap-4">
 //                 <Button variant="outline" className="w-full" disabled>
@@ -63,7 +88,7 @@
 //                       fill="currentColor"
 //                     />
 //                   </svg>
-//                   SignIn with Apple
+//                   SignUp with Apple
 //                 </Button>
 //                 <Button variant="outline" className="w-full" disabled>
 //                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -72,7 +97,7 @@
 //                       fill="currentColor"
 //                     />
 //                   </svg>
-//                   SignIn with Google
+//                   SignUp with Google
 //                 </Button>
 //               </div>
 //               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
@@ -82,27 +107,50 @@
 //               </div>
 //               <div className="grid gap-6">
 //                 <div className="grid gap-3">
-//                   <Label htmlFor="email">Email / Username</Label>
+//                   <Label htmlFor="email">Email</Label>
 //                   <Input
 //                     id="email"
-//                     type="text"
-//                     placeholder="user@email.com or user"
-//                     value={identifier}
-//                     onChange={e => setIdentifier(e.target.value)}
+//                     type="email"
+//                     value={email}
+//                     onChange={e => setEmail(e.target.value)}
+//                     placeholder="user@email.com"
 //                     required
+//                     pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+//                     onInvalid={(e) =>
+//                       (e.target as HTMLInputElement).setCustomValidity(
+//                         "Enter a valid email"
+//                       )
+//                     }
+//                     onInput={(e) =>
+//                       (e.target as HTMLInputElement).setCustomValidity("")
+//                     }
+//                   />
+//                 </div>
+//                 <div className="grid gap-3">
+//                   <Label htmlFor="username">Username</Label>
+//                   <Input
+//                     id="username"
+//                     type="text"
+//                     value={username}
+//                     onChange={e => setUsername(e.target.value)}
+//                     placeholder="user123"
+//                     required
+//                     pattern="^[a-z0-9]{5,}$"
+//                     onInvalid={(e) =>
+//                       (e.target as HTMLInputElement).setCustomValidity(
+//                         "At least 5 characters and only use [a-z, 0-9]"
+//                       )
+//                     }
+//                     onInput={(e) =>
+//                       (e.target as HTMLInputElement).setCustomValidity("")
+//                     }
 //                   />
 //                 </div>
 //                 <div className="grid gap-3">
 //                   <div className="flex items-center">
 //                     <Label htmlFor="password">Password</Label>
-//                     <a
-//                       href="/forgot-pass"
-//                       className="ml-auto text-sm underline-offset-4 hover:underline"
-//                     >
-//                       Forgot your password?
-//                     </a>
 //                   </div>
-//                   <Input
+//                   <Input 
 //                     id="password"
 //                     type="password"
 //                     value={password}
@@ -120,13 +168,13 @@
 //                   />
 //                 </div>
 //                 <Button type="submit" className="w-full">
-//                   SignIn
+//                   SignUp
 //                 </Button>
 //               </div>
 //               <div className="text-center text-sm">
-//                 Don&apos;t have an account?{" "}
-//                 <a href="/signup" className="underline underline-offset-4">
-//                   SignUp
+//                 Have an account?{" "}
+//                 <a href="/signin" className="underline underline-offset-4">
+//                   SignIn
 //                 </a>
 //               </div>
 //             </div>

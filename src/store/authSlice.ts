@@ -1,10 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 interface TokenState {
-  token: string,
-  loading: boolean, // signup
-  loading2: boolean, // signup
-  loading3: boolean, // signin
+  signup_token: string,     // signup
+  signup_loading1: boolean, // signup
+  signup_loading2: boolean, // signup
   forgottoken: string,
   forgottoken2: string,
   loading4: boolean, // forgot
@@ -13,10 +12,9 @@ interface TokenState {
 }
 
 const initialState: TokenState = {
-  token: "",
-  loading: false,
-  loading2: false,
-  loading3: false,
+  signup_token: "",
+  signup_loading1: false,
+  signup_loading2: false,
   forgottoken: "",
   forgottoken2: "",
   loading4: false,
@@ -28,17 +26,14 @@ const authSlice = createSlice({
   name: 'signup',
   initialState,
   reducers: {
-    setToken: (state, action: PayloadAction<string>) => {
-      state.token = action.payload
+    setSignUpToken: (state, action: PayloadAction<string>) => {
+      state.signup_token = action.payload
     },
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.loading = action.payload
+    setSignUpLoading1: (state, action: PayloadAction<boolean>) => {
+      state.signup_loading1 = action.payload
     },
-    setLoading2: (state, action: PayloadAction<boolean>) => {
-      state.loading2 = action.payload
-    },
-    setLoading3: (state, action: PayloadAction<boolean>) => {
-      state.loading3 = action.payload
+    setSignUpLoading2: (state, action: PayloadAction<boolean>) => {
+      state.signup_loading2 = action.payload
     },
     setForgotToken: (state, action: PayloadAction<string>) => {
       state.forgottoken = action.payload
@@ -59,10 +54,9 @@ const authSlice = createSlice({
 })
 
 export const {
-  setToken,
-  setLoading,
-  setLoading2,
-  setLoading3,
+  setSignUpToken,
+  setSignUpLoading1,
+  setSignUpLoading2,
   setForgotToken,
   setForgotToken2,
   setLoading4,

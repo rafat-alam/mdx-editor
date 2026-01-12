@@ -11,4 +11,4 @@ export { SearchBar } from './SearchBar';
 export { formatDate } from './utils';
 
 // Deprecated
-export { PublicReposOLD } from './-PublicReposOLD';
+// export { PublicReposOLD } from './-PublicReposOLD';
