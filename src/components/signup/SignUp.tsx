@@ -18,16 +18,17 @@ import { Input } from "@/components/ui2/input"
 import { Label } from "@/components/ui/label"
 import { AppDispatch, RootState } from "@/store/store"
 import { setSignUpLoading1, setSignUpToken } from "@/store/authSlice"
+import { HelperService } from "@/module/services/helper_service"
 
-const EMAIL_PATTERN = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
-const USERNAME_PATTERN = "^[a-z0-9]{5,}$"
-const NAME_PATTERN = "^[a-z0-9A-Z -_.]{5,}$"
-const PASSWORD_PATTERN = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$"
+const EMAIL_PATTERN = HelperService.email_regex.source
+const USERNAME_PATTERN = HelperService.username_regex.source
+const NAME_PATTERN = HelperService.name_regex.source
+const PASSWORD_PATTERN = HelperService.password_regex.source
 
-const EMAIL_ERROR_MESSAGE = "Enter a valid email"
-const USERNAME_ERROR_MESSAGE = "At least 5 characters and only use [a-z, 0-9]"
-const NAME_ERROR_MESSAGE = "At least 5 characters and only use [a-z, 0-9, A-Z, \" \", _, -]"
-const PASSWORD_ERROR_MESSAGE = "Password must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 special character."
+const EMAIL_ERROR_MESSAGE = HelperService.email_format_msg
+const USERNAME_ERROR_MESSAGE = HelperService.username_format_msg
+const NAME_ERROR_MESSAGE = HelperService.name_format_msg
+const PASSWORD_ERROR_MESSAGE = HelperService.password_format_msg
 
 export function SignUp() {
   const [userEmail, setUserEmail] = useState('')

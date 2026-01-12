@@ -15,6 +15,7 @@ import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { toast } from "sonner"
 import { GalleryVerticalEnd } from "lucide-react"
+import { HelperService } from "@/module/services/helper_service"
 
 interface SignInFormProps extends React.ComponentProps<"div"> {
   setIsLoading: (loading: boolean) => void
@@ -119,11 +120,9 @@ export function SignInForm({
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     required
-                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$"
+                    pattern={HelperService.password_regex.source}
                     onInvalid={(e) =>
-                      (e.target as HTMLInputElement).setCustomValidity(
-                        "Password must be at least 8 characters and include 1 uppercase, 1 lowercase, 1 number, and 1 special character."
-                      )
+                      (e.target as HTMLInputElement).setCustomValidity(HelperService.password_format_msg)
                     }
                     onInput={(e) =>
                       (e.target as HTMLInputElement).setCustomValidity("")
