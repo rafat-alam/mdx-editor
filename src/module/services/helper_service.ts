@@ -81,10 +81,11 @@ export class HelperService {
 
     const jwt_token = await getToken({ req, secret });
     if (!jwt_token || !jwt_token.user_id) {
+      console.log(jwt_token)
       return { message: 'User not authenticated!', status: 401 };
     }
 
-    return { message: "OK!", status: 400}
+    return { message: "OK!", status: 200}
   }
 
   static hash(password: string): string {

@@ -30,37 +30,51 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: res2.message }, { status: res2.status });
     }
 
-    if(path.length < 3) {
+    if(path.length < 2) {
       return NextResponse.json({ message: 'Access Forbidden!' }, { status: 403 });
     }
     
-    const res3: Response = await UserService.get_user_id(path[0]);
+    if(path.length == 2) {
+      const res3: Response = await NodeService.get_node_id_by_link([ path[1] ], token.user_id, token.user_id);
 
-    if (res3.status != 200) {
-      return NextResponse.json({ message: res3.message }, { status: res3.status });
-    }
+      if (res3.status != 200) {
+        return NextResponse.json({ message: res3.message }, { status: res3.status });
+      }
 
-    const owner_id: string = res3.message;
+      const repo_id: string = res3.message;
 
-    const res4: Response = await NodeService.get_node_id_by_link(path.slice(1, -1), owner_id, token.user_id);
+      const res4: Response = await NodeService.rename_repo(repo_id, name, token.user_id);
 
-    if (res4.status != 200) {
       return NextResponse.json({ message: res4.message }, { status: res4.status });
+    } else {
+      const res3: Response = await UserService.get_user_id(path[0]);
+
+      if (res3.status != 200) {
+        return NextResponse.json({ message: res3.message }, { status: res3.status });
+      }
+
+      const owner_id: string = res3.message;
+
+      const res4: Response = await NodeService.get_node_id_by_link(path.slice(1, -1), owner_id, token.user_id);
+
+      if (res4.status != 200) {
+        return NextResponse.json({ message: res4.message }, { status: res4.status });
+      }
+
+      const parent_id: string = res4.message;
+
+      const res5: Response = await NodeService.get_node_id_by_link(path.slice(1), owner_id, token.user_id);
+
+      if (res5.status != 200) {
+        return NextResponse.json({ message: res5.message }, { status: res5.status });
+      }
+
+      const node_id: string = res5.message;
+
+      const res6: Response = await NodeService.rename(parent_id, node_id, name, token.user_id);
+
+      return NextResponse.json({ message: res6.message }, { status: res6.status });
     }
-
-    const parent_id: string = res4.message;
-
-    const res5: Response = await NodeService.get_node_id_by_link(path.slice(1), owner_id, token.user_id);
-
-    if (res5.status != 200) {
-      return NextResponse.json({ message: res5.message }, { status: res5.status });
-    }
-
-    const node_id: string = res5.message;
-
-    const res6: Response = await NodeService.rename(parent_id, node_id, name, token.user_id);
-
-    return NextResponse.json({ message: res6.message }, { status: res6.status });
   } catch {
     return NextResponse.json({ message: 'INTERNAL SERVER ERROR!' }, { status: 500 });
   }

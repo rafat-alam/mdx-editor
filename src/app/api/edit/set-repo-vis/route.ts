@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     name = name.trim();
 
     const res1: Response = await HelperService.check_auth(req);
-            
+
     if(res1.status != 200 || !token) {
       return NextResponse.json({ message: res1.message }, { status: 401 });
     }
