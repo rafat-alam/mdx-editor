@@ -63,9 +63,13 @@ export function PublicRepos() {
     handleRefresh();
   }, []);
 
-  const filteredNodes = nodes?.filter(item =>
-    (item.owner_username + '/' + item.node_name).toLowerCase().includes(searchQuery.trim().toLowerCase())
-  );
+  const filteredNodes = nodes
+    ?.filter(item => (item.owner_username + '/' + item.node_name).toLowerCase().includes(searchQuery.trim().toLowerCase()))
+    .sort((a, b) => {
+      const ownerCompare = a.owner_username.localeCompare(b.owner_username);
+      if (ownerCompare !== 0) return ownerCompare;
+      return a.node_name.localeCompare(b.node_name);
+  });
 
   const renderContent = () => {
     if (!nodes) {

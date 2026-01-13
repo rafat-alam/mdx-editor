@@ -1,53 +1,71 @@
 import {
   BookOpen,
-  Search,
   Sparkles,
   PenLine,
   Save,
   Share2,
-  Lightbulb
+  Lightbulb,
+  FolderTree
 } from 'lucide-react';
 
 const guideSteps = [
   {
     icon: BookOpen,
     title: '1. Create a New Repository',
-    description: 'After signing in, navigate to the "Lesson Plan" page from your dashboard or the navigation menu.',
-    additionalInfo: 'Click on "Create New Lesson" to start a fresh repository or continue working on a saved one.',
+    description:
+      'After signing in, navigate to the “Your Repos” section from your dashboard or the navigation menu.',
+    additionalInfo:
+      'Click on “Create New Repository” to start a fresh repository or continue working on an existing one.',
   },
   {
-    icon: Search,
-    title: '2. Search for a Topic',
-    description: 'Use the search bar in the left sidebar to find a main topic for your repository.',
-    additionalInfo: 'The system will generate a hierarchy of related subtopics that you can customize by adding, removing, or reordering.',
+    icon: FolderTree,
+    title: '2. Create Files & Folders as Topics',
+    description:
+      'Build a file–folder hierarchy in the left sidebar, where folders represent main topics and files act as individual subtopics.',
+    additionalInfo:
+      'You can add, rename, delete, or reorder files and folders to organize your content exactly the way you want.',
   },
   {
     icon: Sparkles,
-    title: '3. Generate Content with RAG',
-    description: 'Select a topic or subtopic from the hierarchy, then use one of the three content generation methods:',
+    title: '3. Generate Initial Content with RAG',
+    description:
+      'Choose a file or topic and generate a first draft by combining repository context, web data, or model knowledge.',
     listItems: [
-      'Web Crawling: Automatically searches and retrieves relevant content from the web',
-      'URL-based: Generate content from specific URLs you provide',
-      'LLM-only: Create content using only the language model\'s knowledge',
+      'Repo-Wide: Builds content using context from the entire repository',
+      'Web Crawling: Collects and synthesizes relevant information from the web',
+      'URL-based: Generates content from specific external sources you provide',
+      'LLM-only: Produces content solely from the language model’s knowledge',
     ],
   },
   {
     icon: PenLine,
-    title: '4. Edit and Refine Content',
-    description: 'Use the MDX editor to modify the generated content. You can view it in code, preview, or split view modes.',
-    additionalInfo: 'Select text and use the refinement options to improve specific sections with additional web content or LLM assistance.',
+    title: '4. Edit, Review & Refine',
+    description:
+      'Manually edit the draft and iteratively improve it using the MDX editor with real-time previews.',
+    additionalInfo:
+      'Apply targeted refinements to selected sections for better accuracy, structure, and clarity:',
+    listItems: [
+      'Enhance weak sections with additional repository context',
+      'Augment content with fresh or authoritative web sources',
+      'Refine specific parts using trusted URLs',
+      'Polish language and structure using LLM-only refinement',
+    ],
   },
   {
     icon: Save,
-    title: '5. Save Your MDX Files',
-    description: 'Click "Save MDX" to save the content for the current topic. Topics with saved content will be highlighted in the hierarchy.',
-    additionalInfo: 'When you\'re ready to save the entire repository, click "Save Lesson" at the top of the page.',
+    title: '5. Validate & Save MDX Content',
+    description:
+      'Review the final output, validate formatting and structure, and save the MDX file to persist your work.',
+    additionalInfo:
+      'Saved content is versioned and can be revisited, updated, or published at any time.',
   },
   {
     icon: Share2,
     title: '6. Share Your Knowledge',
-    description: 'Toggle the "Public" option when saving to make your repository available to the community.',
-    additionalInfo: 'Public repositories can be viewed by anyone through the "Public Lessons" page, helping others learn from your expertise.',
+    description:
+      'Enable the “Public” option while saving to make your repository accessible to the community.',
+    additionalInfo:
+      'Public repositories can be viewed by anyone from the “Public Repos” page, helping others learn from your knowledge.',
   },
 ];
 

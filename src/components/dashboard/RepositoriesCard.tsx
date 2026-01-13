@@ -147,7 +147,9 @@ export function RepositoriesCard({
 
           const filteredItems = node?.filter(item =>
             item.node_name.toLowerCase().includes(searchQuery.trim().toLowerCase())
-          );
+          ).sort((a, b) =>
+            a.node_name.localeCompare(b.node_name, undefined, { sensitivity: "base" }
+          ));
 
           if(filteredItems?.length! > 0) {
             return <RepositoryList

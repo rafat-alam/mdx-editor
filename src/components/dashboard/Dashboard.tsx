@@ -16,6 +16,7 @@ import { AddFileDialog } from './AddFileDialog';
 import { AddRepoDialog } from './AddRepoDialog';
 import { MDXEditorDialog } from './MDXEditorDialog';
 import { SeeProfilesDialog } from './SeeProfilesDialog';
+import { HelperService } from '@/module/services/helper_service';
 
 interface _Node {
   node_name: string;
@@ -56,7 +57,7 @@ export function Dashboard({ path }: Props) {
   const [isAddingFolder, setIsAddingFolder] = useState(false);
   const [isAddFolderDialogOpen, setIsAddFolderDialogOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
-  const nameRegex = /^[A-Za-z0-9_-]{1,256}$/;
+  const nameRegex = HelperService.node_name_regex;
   const [isAddingFile, setIsAddingFile] = useState(false);
   const [isAddFileDialogOpen, setIsAddFileDialogOpen] = useState(false);
   const [fileName, setFileName] = useState("");
@@ -258,7 +259,7 @@ export function Dashboard({ path }: Props) {
     setIsAddingFile(true);
     
     try {
-      await axios.post('/api/edit/add-file', { path, name: fileName + ".mdx" });
+      await axios.post('/api/edit/add-file', { path, name: fileName });
       toast.success("File Added!")
     } catch (error: any) {
       if (axios.isAxiosError(error)) {

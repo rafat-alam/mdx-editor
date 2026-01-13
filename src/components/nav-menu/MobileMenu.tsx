@@ -76,7 +76,7 @@ export function MobileMenu({ session }: MobileMenuProps) {
                     onClick={handleLinkClick}
                     className="px-4 py-2 text-sm font-bold hover:bg-accent rounded-md transition-colors"
                   >
-                    {session.user.username}
+                    Dashboard - {session.user.username}
                   </a>
                   <SignOutButton />
                 </div>

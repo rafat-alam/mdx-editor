@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { dir } from "root/db/schema";
 import { _Node } from "../entities/node";
 import { getDB } from "root/db";
@@ -38,7 +38,7 @@ export class NodeRepo {
 
   static async is_name_already_present(parent_id: string, new_name: string): Promise<boolean> {
     const nodes = await this.find_nodes(
-      and(eq(dir.parent_id, parent_id), eq(dir.node_name, new_name))
+      and(eq(dir.parent_id, parent_id), sql`LOWER(${dir.node_name}) = LOWER(${new_name})`)
     );
     return nodes.length > 0;
   }

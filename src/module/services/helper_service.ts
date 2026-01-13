@@ -9,11 +9,7 @@ export class HelperService {
 
   static password_regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,256}$/;
 
-  static repo_name_regex = /^[A-Za-z0-9_-]{1,256}$/;
-
-  static folder_name_regex = /^[A-Za-z0-9_-]{1,256}$/;
-
-  static file_name_regex = /^[A-Za-z0-9_-]{1,256}$/;
+  static node_name_regex = /^[A-Za-z0-9_-]{1,256}$/;
 
   static email_format_msg = "Enter a valid E-Mail address.";
 
@@ -23,11 +19,7 @@ export class HelperService {
 
   static password_format_msg = "Password must be at least 8 characters and must include at least one uppercase letter, one lowercase letter, one number, and one special character.";
 
-  static repo_format_msg = "Repo Name should have at least 5 characters and may contain only [a-z, 0-9, -, _].";
-
-  static folder_format_msg = "Folder Name should have at least 5 characters and may contain only [a-z, 0-9, -, _].";
-
-  static file_format_msg = "File Name should have at least 5 characters and may contain only [a-z, 0-9, -, _].";
+  static node_format_msg = "Name should have at least 1 characters and may contain only [a-z, 0-9, -, _].";
 
   static hash(password: string): string {
     const salt = randomBytes(16).toString("hex");

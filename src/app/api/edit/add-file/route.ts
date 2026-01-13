@@ -24,11 +24,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'User not authenticated!' }, { status: 401 });
     }
 
-    const name_regex = /^[A-Za-z0-9._ -]{1,256}$/;
+    const name_regex = /^[A-Za-z0-9_-]{1,256}$/;
 
     if (!name_regex.test(name)) {
       return NextResponse.json({ message: 'Name of File is not in valid format!' }, { status: 400 });
     }
+
+    name += ".mdx";
 
     if(path.length < 2) {
       return NextResponse.json({ message: 'Access Forbidden!' }, { status: 403 });
