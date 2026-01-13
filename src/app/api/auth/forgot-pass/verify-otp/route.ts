@@ -11,6 +11,10 @@ export async function POST(req: NextRequest) {
   try {
     let { token, otp } = await req.json();
 
+    if (typeof token !== "string" || typeof otp !== "string") {
+      return NextResponse.json({ message: 'Bad Request!' }, { status: 400 });
+    }
+
     token = token.trim();
     otp = otp.trim();
 

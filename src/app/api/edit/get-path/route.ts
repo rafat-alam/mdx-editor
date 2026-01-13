@@ -21,6 +21,10 @@ export async function POST(req: NextRequest) {
   try {
     const { path } = await req.json();
 
+    if (!Array.isArray(path) || !path.every(p => typeof p === "string")) {
+      return NextResponse.json({ message: "Bad Request!" }, { status: 400 });
+    }
+
     const token = await getToken({ req, secret });
 
     let user_id: string = "temp-token";

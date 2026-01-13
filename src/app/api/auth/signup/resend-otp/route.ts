@@ -10,6 +10,10 @@ export async function POST(req: NextRequest) {
   try {
     let { token } = await req.json();
 
+    if (typeof token !== "string") {
+      return NextResponse.json({ message: 'Bad Request!' }, { status: 400 });
+    }
+
     token = token.trim();
     
     if (!token) {

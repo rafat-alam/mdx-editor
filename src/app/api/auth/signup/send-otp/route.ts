@@ -10,6 +10,10 @@ interface Response {
 export const POST = async (req: NextRequest) => {
   try {
     let { name, email, username, password } = await req.json();
+
+    if (typeof name !== "string" || typeof email !== "string" || typeof username !== "string" || typeof password !== "string") {
+      return NextResponse.json({ message: 'Bad Request!' }, { status: 400 });
+    }
     
     name = name.trim();
     email = email.trim().toLowerCase();

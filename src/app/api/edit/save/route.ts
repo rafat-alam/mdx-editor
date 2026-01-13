@@ -14,9 +14,18 @@ interface Response {
 export async function POST(req: NextRequest) {
   try {
     let { content, path } = await req.json();
+
+    if (!Array.isArray(path) || !path.every(p => typeof p === "string")) {
+      return NextResponse.json({ message: "Bad Request!" }, { status: 400 });
+    }
+
+    if (content !== undefined && typeof content !== "string") {
+      return NextResponse.json({ message: 'Bad Request!' }, { status: 400 });
+    } else if(content === undefined) {
+      content = HelperService.DEFAULT_CONTENT;
+    }
+
     const token = await getToken({ req, secret });
-    
-    content ??= HelperService.DEFAULT_CONTENT;
 
     const res1: Response = await HelperService.check_auth(req);
         

@@ -14,6 +14,15 @@ interface Response {
 export async function POST(req: NextRequest) {
   try {
     let { path, name } = await req.json();
+
+    if (!Array.isArray(path) || !path.every(p => typeof p === "string")) {
+      return NextResponse.json({ message: "Bad Request!" }, { status: 400 });
+    }
+
+    if (typeof name !== "string") {
+      return NextResponse.json({ message: 'Bad Request!' }, { status: 400 });
+    }
+
     const token = await getToken({ req, secret });
 
     name = name.trim();
