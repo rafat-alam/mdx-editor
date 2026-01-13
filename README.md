@@ -53,11 +53,11 @@
 ## Project Structure
 ```
 db/
-├── index.ts (function to get _db)
+├── index.ts  (function to get _db instance)
 └── schema.ts
 
 public/
-└── team (team profile picture)
+└── team/     (team profile picture)
 
 src/
 ├── app/
@@ -128,7 +128,7 @@ src/
 │       ├── node_service.ts
 │       └── user_service.ts
 │
-└── store/
+└── store/              (Redux Toolkit)
     ├── authSlice.ts
     └── store.ts
 
@@ -149,6 +149,32 @@ README.md
 tsconfig.json
 ```
 
+## API Flow
+```
+Client (UI / Fetch / Axios)
+   ↓
+Middleware (Edge)
+   - coarse auth gate (logged in or not)
+   - protected route allow/deny
+   - lightweight session existence check
+   ↓
+API Route (Controller)
+   - full auth check (authoritative)
+   - input validation
+   - normalize data
+   ↓
+Service (Business Logic)
+   - permissions (ownership, roles)
+   - workflows
+   - transactions
+   - orchestration
+   ↓
+Repository (Data Access)
+   - DB queries only
+   ↓
+Database
+```
+
 ## Local Development Setup
 ### Clone Repo
 ```bash
@@ -157,7 +183,6 @@ cd mdx-editor
 ```
 
 ### Create .env file
-Add .env inside mdx-editor folder
 ```.env
 # Database connection string
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DB_NAME?sslmode=require"
@@ -189,13 +214,11 @@ npx drizzle-kit migrate
 ```
 
 ### Run Project (Live / Fast-Refresh)
-Run these commands inside mdx-editor folder
 ```bash
 npm run dev
 ```
 
 ### Run Project (Stable & Fast)
-Run these commands inside mdx-editor folder
 ```bash
 npm run build
 npm run start
