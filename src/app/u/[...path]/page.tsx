@@ -10,9 +10,9 @@ export default async function UserPage({
   const { path } = await params;
 
   let { m } = await searchParams;
-  let val: boolean = false;
-  if(m && m == "1") {
-    val = true;
+  let val: number = 0;
+  if(m) {
+    val = Number(m);
   }
 
   return <Dashboard path={path} m={val} />;

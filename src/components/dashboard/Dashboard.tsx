@@ -27,7 +27,7 @@ interface _Node {
 
 interface Props {
   path: string[];
-  m: boolean;
+  m: number;
 }
 
 interface AxiosResponse1 {
@@ -72,7 +72,7 @@ export function Dashboard({ path, m }: Props) {
   const [MDXPath, setMDXPath] = useState("");
   const [isSeeProfilesDialogOpen, setIsSeeProfilesDialogOpen] = useState(false);
   const [seeProfilesUsername, setSeeProfilesUsername] = useState("");
-  const [mode, setMode] = useState((path.length > 1) || m ? 0 : 1);
+  const [mode, setMode] = useState((path.length > 1) || (m == 1) ? 0 : 1);
   const [loadingContent, setLoadingContent] = useState(true);
   const [loadingUser, setLoadingUser] = useState(true);
   const [isContentArrived, setIsContentArrived] = useState(false);
@@ -371,12 +371,20 @@ export function Dashboard({ path, m }: Props) {
         onModeToggle={() => setMode(1 - mode)}
         onSearchChange={setSearchQuery}
         onBackClick={() => {
-          const newPath = pathname.split("/").slice(0, -1).join("/");
-          router.replace(`${newPath}?m=1`, { scroll: false });
+          if(path.length == 2 && m == 2) {
+            router.replace('/public-repos');
+          } else {
+            const newPath = pathname.split("/").slice(0, -1).join("/");
+            router.replace(`${newPath}?m=${m}`, { scroll: false });
+          }
         }}
         onFolderClick={(folderName: string) => {
           const newPath = [...pathname.split("/"), folderName].join("/");
-          router.replace(newPath, { scroll: false });
+          if(m == 0) {
+            router.replace(`${newPath}?m=1`, { scroll: false });
+          } else {
+            router.replace(`${newPath}?m=${m}`, { scroll: false });
+          }
         }}
         onFileClick={(fileName: string) => {
           const newPath = [...pathname.split("/"), fileName].filter(Boolean).slice(1).join("/");
