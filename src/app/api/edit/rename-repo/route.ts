@@ -1,3 +1,4 @@
+import { HelperService } from '@/module/services/helper_service';
 import { NodeService } from '@/module/services/node_service';
 import { getToken } from 'next-auth/jwt';
 import { NextRequest, NextResponse } from 'next/server';
@@ -11,34 +12,41 @@ interface Response {
 
 export async function POST(req: NextRequest) {
   try {
-    const { old_name, new_name } = await req.json();
-
+    let { old_name, new_name } = await req.json();
     const token = await getToken({ req, secret });
-    if (!token || !token.user_id) {
-      return NextResponse.json({ message: 'User not authenticated!' }, { status: 401 });
+
+    old_name = old_name.trim();
+    new_name = new_name.trim();
+    
+    const res1: Response = await HelperService.check_auth(req);
+    
+    if(res1.status != 200 || !token) {
+      return NextResponse.json({ message: res1.message }, { status: 401 });
     }
 
-    const name_regex = /^[A-Za-z0-9._ -]{1,256}$/;
-
-    if (!name_regex.test(new_name)) {
-      return NextResponse.json({ message: 'Name of Repo is not in valid format!' }, { status: 400 });
+    const res2: Response = HelperService.check_node_name(old_name);
+    
+    if(res2.status != 200) {
+      return NextResponse.json({ message: res2.message }, { status: res2.status });
     }
 
-    if (!old_name || !new_name) {
-      return NextResponse.json({ message: 'Missing Fields!' }, { status: 400 });
+    const res3: Response = HelperService.check_node_name(new_name);
+    
+    if(res3.status != 200) {
+      return NextResponse.json({ message: res3.message }, { status: res3.status });
     }
 
-    const res1: Response = await NodeService.get_node_id_by_link([ old_name ], token.user_id, token.user_id);
+    const res4: Response = await NodeService.get_node_id_by_link([ old_name ], token.user_id, token.user_id);
 
-    if (res1.status != 200) {
-      return NextResponse.json({ message: res1.message }, { status: res1.status });
+    if (res4.status != 200) {
+      return NextResponse.json({ message: res4.message }, { status: res4.status });
     }
 
-    const repo_id: string = res1.message;
+    const repo_id: string = res4.message;
 
-    const res2: Response = await NodeService.rename_repo(repo_id, new_name, token.user_id);
+    const res5: Response = await NodeService.rename_repo(repo_id, new_name, token.user_id);
 
-    return NextResponse.json({ message: res2.message }, { status: res2.status });
+    return NextResponse.json({ message: res5.message }, { status: res5.status });
   } catch {
     return NextResponse.json({ message: 'INTERNAL SERVER ERROR!' }, { status: 500 });
   }

@@ -2,11 +2,8 @@
 
 Future Updates:
 1. Update forgot-pass
-2. Make components of YOur Repos
-3. Finish Editor
-4. Make check for APIs
-
-
+2. Finish Editor
+3. Rename File, Folder, Repos
 
 ## Clone Repo
 ```bash

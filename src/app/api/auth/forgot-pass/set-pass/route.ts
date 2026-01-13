@@ -1,4 +1,5 @@
 import { AuthService } from "@/module/services/auth_service";
+import { HelperService } from "@/module/services/helper_service";
 import { NextRequest, NextResponse } from "next/server";
 
 interface Response {
@@ -9,25 +10,23 @@ interface Response {
 export async function POST(req: NextRequest) {
   try {
     let { token, password } = await req.json();
+
+    token = token.trim();
     password = password.trim();
 
-    if (!password) {
-      return NextResponse.json({ message: 'Missing password!' }, { status: 400 });
+    const res1: Response = HelperService.check_password(password);
+    
+    if (res1.status != 200) {
+      return NextResponse.json({ message: res1.message }, { status: res1.status });
     }
     
     if (!token) {
       return NextResponse.json({ message: 'Invalid or expired token!' }, { status: 401 });
     }
 
-    const password_regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+    const res2: Response = await AuthService.set_password(token, password);
 
-    if (!password_regex.test(password)) {
-      return NextResponse.json({ message: 'Password is not in valid format!' }, { status: 400 });
-    }
-
-    const res: Response = await AuthService.set_password(token, password);
-
-    return NextResponse.json({ message: res.message }, { status: res.status });
+    return NextResponse.json({ message: res2.message }, { status: res2.status });
   } catch {
     return NextResponse.json({ message: 'INTERNAL SERVER ERROR!' }, { status: 500 });
   }

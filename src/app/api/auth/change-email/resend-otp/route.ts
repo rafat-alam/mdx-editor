@@ -1,8 +1,6 @@
 import { AuthService } from "@/module/services/auth_service";
-import { getToken } from "next-auth/jwt";
+import { HelperService } from "@/module/services/helper_service";
 import { NextRequest, NextResponse } from "next/server";
-
-const secret = process.env.NEXTAUTH_SECRET ?? 'rafat';
 
 interface Response {
   status: number;
@@ -11,19 +9,23 @@ interface Response {
 
 export async function POST(req: NextRequest) {
   try {
-    const { token } = await req.json();
+    let { token } = await req.json();
+
+    token = token.trim();
+
     if (!token) {
       return NextResponse.json({ message: 'Invalid or expired token!' }, { status: 401 });
     }
 
-    const jwt_token = await getToken({ req, secret });
-    if (!jwt_token || !jwt_token.user_id) {
-      return NextResponse.json({ message: 'User not authenticated!' }, { status: 401 });
+    const res1: Response = await HelperService.check_auth(req);
+    
+    if(res1.status != 200) {
+      return NextResponse.json({ message: res1.message }, { status: res1.status });
     }
 
-    const res: Response = await AuthService.resend_reset_otp(token);
+    const res2: Response = await AuthService.resend_reset_otp(token);
 
-    return NextResponse.json({ message: res.message }, { status: res.status });
+    return NextResponse.json({ message: res2.message }, { status: res2.status });
   } catch {
     return NextResponse.json({ message: 'INTERNAL SERVER ERROR!' }, { status: 500 });
   }

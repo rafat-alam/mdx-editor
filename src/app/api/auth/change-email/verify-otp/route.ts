@@ -1,8 +1,6 @@
 import { AuthService } from "@/module/services/auth_service";
-import { getToken } from "next-auth/jwt";
+import { HelperService } from "@/module/services/helper_service";
 import { NextRequest, NextResponse } from "next/server";
-
-const secret = process.env.NEXTAUTH_SECRET ?? 'rafat';
 
 interface Response {
   status: number;
@@ -11,22 +9,30 @@ interface Response {
 
 export async function POST(req: NextRequest) {
   try {
-    const { token, otp } = await req.json();
-    if (!otp) {
-      return NextResponse.json({ message: 'Missing OTP!' }, { status: 400 });
+    let { token, otp } = await req.json();
+
+    token = token.trim();
+    otp = otp.trim();
+
+    const res1: Response = HelperService.check_otp(otp);
+
+    if (res1.status != 200) {
+      return NextResponse.json({ message: res1.message }, { status: res1.status });
     }
+    
     if (!token) {
       return NextResponse.json({ message: 'Invalid or expired token!' }, { status: 400 });
     }
 
-    const jwt_token = await getToken({ req, secret });
-    if (!jwt_token || !jwt_token.user_id) {
-      return NextResponse.json({ message: 'User not authenticated!' }, { status: 498 });
+    const res2: Response = await HelperService.check_auth(req);
+
+    if(res2.status != 200) {
+      return NextResponse.json({ message: res2.message }, { status: res2.status });
     }
+    
+    const res3: Response = await AuthService.verify_reset_otp(token, otp);
 
-    const res: Response = await AuthService.verify_reset_otp(token, otp);
-
-    return NextResponse.json({ message: res.message }, { status: res.status });
+    return NextResponse.json({ message: res3.message }, { status: res3.status });
   } catch {
     return NextResponse.json({ message: 'INTERNAL SERVER ERROR!' }, { status: 500 });
   }

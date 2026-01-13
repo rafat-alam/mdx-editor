@@ -1,5 +1,5 @@
 import { AuthService } from "@/module/services/auth_service";
-import { getToken } from "next-auth/jwt";
+import { HelperService } from "@/module/services/helper_service";
 import { NextRequest, NextResponse } from "next/server";
 
 const secret = process.env.NEXTAUTH_SECRET ?? 'rafat';
@@ -12,22 +12,24 @@ interface Response {
 export async function POST(req: NextRequest) {
   try {
     let { email } = await req.json();
+
     email = email.trim().toLowerCase();
 
-    const token = await getToken({ req, secret });
-    if (!token || !token.user_id) {
-      return NextResponse.json({ message: 'User not authenticated!' }, { status: 498 });
+    const res1: Response = await HelperService.check_auth(req);
+
+    if(res1.status != 200) {
+      return NextResponse.json({ message: res1.message }, { status: res1.status });
     }
 
-    const email_regex = /^(?:[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}|(?:\[(?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\]))$/;
+    const res2: Response = HelperService.check_email(email);
 
-    if (!email_regex.test(email)) {
-      return NextResponse.json({ message: 'E-Mail is not in valid format!' }, { status: 400 });
+    if (res2.status != 200) {
+      return NextResponse.json({ message: res2.message }, { status: res2.status });
     }
     
-    const res: Response = await AuthService.init_change_email(email);
+    const res3: Response = await AuthService.init_change_email(email);
 
-    return NextResponse.json({ message: res.message }, { status: res.status });
+    return NextResponse.json({ message: res3.message }, { status: res3.status });
   } catch {
     return NextResponse.json({ message: 'INTERNAL SERVER ERROR!' }, { status: 500 });
   }

@@ -8,8 +8,7 @@ import { EditorPanel } from './EditorPanel';
 import { PreviewPanel } from './PreviewPanel';
 import { MobileTabSelector } from './MobileTabSelector';
 import { useMobileView } from './useMobileView';
-
-const DEFAULT_CONTENT = '# Hello, MDX!\n\nThis is a sample MDX document.\n\n```js\nconsole.log("Hello world");\n```\n\n## Features\n\n- **Bold text** and *italic text*\n- Lists and code blocks\n- And more!';
+import { HelperService } from '@/module/services/helper_service';
 
 interface Props {
   path: string[];
@@ -27,7 +26,7 @@ export function Editor({ path }: Props) {
   const router = useRouter();
   const { data: session, status } = useSession();
   
-  const [mdxContent, setMdxContent] = useState(DEFAULT_CONTENT);
+  const [mdxContent, setMdxContent] = useState(HelperService.DEFAULT_CONTENT);
   const [isEditorFullscreen, setIsEditorFullscreen] = useState(false);
   const [isPreviewFullscreen, setIsPreviewFullscreen] = useState(false);
   const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');

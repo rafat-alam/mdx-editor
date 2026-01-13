@@ -11,8 +11,11 @@ export default async function UserPage({
 
   let { m } = await searchParams;
   let val: number = 0;
-  if(m) {
-    val = Number(m);
+  if (m !== undefined) {
+    const num = Number(m);
+    if (!Number.isNaN(num)) {
+      val = num;
+    }
   }
 
   return <Dashboard path={path} m={val} />;

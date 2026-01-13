@@ -35,9 +35,11 @@ export async function GET(
   { params }: { params: { username: string } }
 ) {
   try {
-    const token = await getToken({ req, secret });
-    const { username } = await params;
+    let { username } = await params;
 
+    username = username.trim();
+
+    const token = await getToken({ req, secret });
     let user_id: string = "temp-token";
     if (token && token.user_id) {
       user_id = token.user_id;

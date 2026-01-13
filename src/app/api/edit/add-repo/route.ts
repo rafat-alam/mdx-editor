@@ -1,3 +1,4 @@
+import { HelperService } from '@/module/services/helper_service';
 import { NodeService } from '@/module/services/node_service';
 import { getToken } from 'next-auth/jwt';
 import { NextRequest, NextResponse } from 'next/server';
@@ -12,24 +13,25 @@ interface Response {
 export async function POST(req: NextRequest) {
   try {
     let { name } = await req.json();
-
-    name = name.trim();
-
     const token = await getToken({ req, secret });
 
-    if (!token || !token.user_id) {
-      return NextResponse.json({ message: 'User not authenticated!' }, { status: 401 });
+    name = name.trim();
+  
+    const res1: Response = await HelperService.check_auth(req);
+
+    if(res1.status != 200 || !token) {
+      return NextResponse.json({ message: res1.message }, { status: 401 });
     }
 
-    const name_regex = /^[A-Za-z0-9._ -]{1,256}$/;
-
-    if (!name_regex.test(name)) {
-      return NextResponse.json({ message: 'Name of Repo is not in valid format!' }, { status: 400 });
+    const res2: Response = HelperService.check_node_name(name);
+    
+    if(res2.status != 200) {
+      return NextResponse.json({ message: res2.message }, { status: res2.status });
     }
 
-    const res: Response = await NodeService.add_repo(name, token.user_id);
+    const res3: Response = await NodeService.add_repo(name, token.user_id);
 
-    return NextResponse.json({ message: res.message }, { status: res.status });
+    return NextResponse.json({ message: res3.message }, { status: res3.status });
   } catch {
     return NextResponse.json({ message: 'INTERNAL SERVER ERROR!' }, { status: 500 });
   }
