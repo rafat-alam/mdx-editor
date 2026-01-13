@@ -27,6 +27,7 @@ interface _Node {
 
 interface Props {
   path: string[];
+  m: boolean;
 }
 
 interface AxiosResponse1 {
@@ -45,7 +46,7 @@ interface UserInterface {
   repo_count: number;
 }
 
-export function Dashboard({ path }: Props) {
+export function Dashboard({ path, m }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const { data: session, status } = useSession();
@@ -71,7 +72,7 @@ export function Dashboard({ path }: Props) {
   const [MDXPath, setMDXPath] = useState("");
   const [isSeeProfilesDialogOpen, setIsSeeProfilesDialogOpen] = useState(false);
   const [seeProfilesUsername, setSeeProfilesUsername] = useState("");
-  const [mode, setMode] = useState(path.length > 1 ? 0 : 1);
+  const [mode, setMode] = useState((path.length > 1) || m ? 0 : 1);
   const [loadingContent, setLoadingContent] = useState(true);
   const [loadingUser, setLoadingUser] = useState(true);
   const [isContentArrived, setIsContentArrived] = useState(false);
@@ -371,7 +372,7 @@ export function Dashboard({ path }: Props) {
         onSearchChange={setSearchQuery}
         onBackClick={() => {
           const newPath = pathname.split("/").slice(0, -1).join("/");
-          router.replace(newPath, { scroll: false });
+          router.replace(`${newPath}?m=1`, { scroll: false });
         }}
         onFolderClick={(folderName: string) => {
           const newPath = [...pathname.split("/"), folderName].join("/");

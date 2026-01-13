@@ -1,5 +1,13 @@
 # mdx-editor
 
+Future Updates:
+1. Update forgot-pass
+2. Make components of YOur Repos
+3. Finish Editor
+4. Make check for APIs
+
+
+
 ## Clone Repo
 ```bash
 git clone https://github.com/rafat-alam/mdx-editor.git

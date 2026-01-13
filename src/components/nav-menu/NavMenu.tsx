@@ -31,7 +31,7 @@ export async function NavMenu() {
           </a>
           {session && (
             <div className="hidden min-[710px]:block">
-              <a href="/your-repos" className={navigationMenuTriggerStyle()}>
+              <a href={`/u/${session.user.username}?m=1`} className={navigationMenuTriggerStyle()}>
                 Your Repos...
               </a>
             </div>
