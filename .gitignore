@@ -31,7 +31,7 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # drizzle
-/drizzle
+drizzle/
 
 # env files (can opt-in for committing if needed)
 .env*
