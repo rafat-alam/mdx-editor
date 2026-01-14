@@ -41,7 +41,6 @@
 ### v1 🚀
 
 1. Finish the Editor ✍️
-2. Rename files, folders, and repositories 📝
 
 ### v2 🌱
 

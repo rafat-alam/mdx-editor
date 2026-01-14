@@ -17,6 +17,7 @@ import { AddRepoDialog } from './AddRepoDialog';
 import { MDXEditorDialog } from './MDXEditorDialog';
 import { SeeProfilesDialog } from './SeeProfilesDialog';
 import { HelperService } from '@/module/services/helper_service';
+import { RenameDialog } from './RenameDialog';
 
 interface _Node {
   node_name: string;
@@ -59,6 +60,9 @@ export function Dashboard({ path, m }: Props) {
   const [isAddFolderDialogOpen, setIsAddFolderDialogOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
   const nameRegex = HelperService.node_name_regex;
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
+  const [rename, setRename] = useState("");
   const [isAddingFile, setIsAddingFile] = useState(false);
   const [isAddFileDialogOpen, setIsAddFileDialogOpen] = useState(false);
   const [fileName, setFileName] = useState("");
@@ -143,6 +147,41 @@ export function Dashboard({ path, m }: Props) {
   useEffect(() => {
     handleRefresh();
   }, [pathname]);
+
+  const handleRename = async () => {
+    setIsRenaming(true);
+
+    try {
+      await axios.post('/api/edit/rename', { path: [...path, nextChild], name: rename});
+
+      toast.success("Rename Successful!")
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+
+        if (!status) {
+          toast.error("Network error!");
+          return;
+        }
+
+        if (status === 400) toast.error(error.response?.data?.message ?? "Bad request");
+        else if (status === 401) router.push("/signin");
+        else if (status === 403) router.push("/");
+        else if (status === 404) router.push("/404");
+        else router.push("/");
+      } else {
+        toast.error("Unexpected error occurred!");
+      }
+    }
+    
+    setIsRenameDialogOpen(false);
+    setIsRenaming(false);
+    handleRefresh();
+  }
+
+  const handleRenameClick = () => {
+    setIsRenameDialogOpen(true);
+  }
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -380,7 +419,7 @@ export function Dashboard({ path, m }: Props) {
         }}
         onRenameClick={(nodeName: string) => {
           setNextChild(nodeName);
-          handleDeleteClick();
+          handleRenameClick();
         }}
         onFolderClick={(folderName: string) => {
           const newPath = [...pathname.split("/"), folderName].join("/");
@@ -409,6 +448,16 @@ export function Dashboard({ path, m }: Props) {
         isDeleting={isDeleting}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDelete}
+      />
+
+      <RenameDialog
+        isOpen={isRenameDialogOpen}
+        isRenaming={isRenaming}
+        rename={rename}
+        nameRegex={nameRegex}
+        onOpenChange={setIsRenameDialogOpen}
+        onRenameChange={setRename}
+        onConfirm={handleRename}
       />
 
       <AddFolderDialog
