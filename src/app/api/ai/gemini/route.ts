@@ -7,7 +7,17 @@ export async function POST(req: NextRequest) {
   try {
     const { content, query, model } = await req.json();
 
-    if (!query || !model) {
+    if (typeof content !== "string" || typeof query !== "string" || typeof model !== "string") {
+      return NextResponse.json({ message: 'Bad Request!' }, { status: 400 });
+    }
+
+    if (model !== 'gemini-2.0-flash-lite' && model !== 'gemini-2.0-flash'
+        && model !== 'gemini-2.5-flash-lite' && model !== 'gemini-2.5-flash'
+        && model !== 'gemini-3-flash-preview') {
+      return NextResponse.json({ message: 'Bad Request!' }, { status: 400 });
+    }
+
+    if (!query) {
       return NextResponse.json({ message: 'Missing fields!' }, { status: 400 });
     }
 

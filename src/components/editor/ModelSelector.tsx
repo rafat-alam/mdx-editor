@@ -32,6 +32,10 @@ export function ModelSelector({ model, setModel }: ModelSelectorProps) {
             <SelectItem value="gemini-3-flash-preview">Gemini 3 Flash (Preview)</SelectItem>
             <SelectLabel>OpenAI Models</SelectLabel>
             <SelectItem value="gpt5.2" disabled>ChatGPT 5.2</SelectItem>
+            <SelectLabel>RAGs</SelectLabel>
+            <SelectItem value="rag-repo" disabled>RAG Repo</SelectItem>
+            <SelectItem value="rag-web" disabled>RAG Web</SelectItem>
+            <SelectItem value="rag-url" disabled>RAG Url</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>

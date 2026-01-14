@@ -38,10 +38,6 @@
 
 ## Future Updates 🔮🛠️
 
-### v1 🚀
-
-1. Finish the Editor ✍️
-
 ### v2 🌱
 
 1. Profile settings 👤
@@ -51,6 +47,11 @@
 5. Change password 🔒
 6. Middleware to Proxy 🧩
 7. OAuth SignIn / SignUp 🔑
+8. Connect RAG 🤖
+
+### v3
+
+1. Connect GPT
 
 ## Project Structure 🗂️
 
@@ -68,9 +69,8 @@ src/
 │   │
 │   ├── api
 │   │   ├── ai
-│   │   │   └── gemini                (route)
-│   │   │
-│   │   ├── rag                       (route)
+│   │   │   ├── gemini                (route)
+│   │   │   └── gpt                   (route) (Comming Soon...)
 │   │   │
 │   │   ├── auth
 │   │   │   ├── [...nextauth]         (route)
@@ -89,6 +89,11 @@ src/
 │   │   ├── get
 │   │   │   ├── all-public-repos      (route)
 │   │   │   └── path                  (route)
+│   │   │
+│   │   ├── rag
+│   │   │   ├── repo                  (route) (Comming Soon...)
+│   │   │   ├── url                   (route) (Comming Soon...)
+│   │   │   └── web                   (route) (Comming Soon...)
 │   │   │
 │   │   └── u/[username]              (route)
 │   │

@@ -20,6 +20,9 @@ interface EditorPanelProps {
   onTextareaScroll: () => void;
   setMdxContent: React.Dispatch<React.SetStateAction<string>>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedText: string;
+  setSelectedText: React.Dispatch<React.SetStateAction<string>>;
+  path: string [];
 }
 
 export function EditorPanel({
@@ -39,7 +42,20 @@ export function EditorPanel({
   onTextareaScroll,
   setMdxContent,
   setLoading,
+  selectedText,
+  setSelectedText,
+  path,
 }: EditorPanelProps) {
+  const getSelectedText = () => {
+    const el = taRef.current
+    if (!el) return ''
+
+    const { selectionStart, selectionEnd, value } = el
+    if (selectionStart === selectionEnd) return ''
+
+    return value.slice(selectionStart, selectionEnd)
+  }
+
   return (
     <div
       className={`${getEditorWidth()} h-full border-r border-slate-200 dark:border-slate-700 transition-all duration-300 ${
@@ -56,6 +72,8 @@ export function EditorPanel({
         saveButtonDisable={saveButtonDisable}
         isEditorFullscreen={isEditorFullscreen}
         toggleEditorFullscreen={toggleEditorFullscreen}
+        selectedText={selectedText}
+        path={path}
       />
       
       {loading ? (
@@ -71,6 +89,14 @@ export function EditorPanel({
           readOnly={!isAdmin}
           ref={taRef}
           onScroll={onTextareaScroll}
+          onMouseUp={() => {
+            const selected = getSelectedText()
+            setSelectedText(selected)
+          }}
+          onKeyUp={() => {
+            const selected = getSelectedText()
+            setSelectedText(selected)
+          }}
         />
       )}
     </div>

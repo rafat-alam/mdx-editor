@@ -1,6 +1,6 @@
 export { Editor } from './Editor';
 export { AdminIndicator } from './AdminIndicator';
-export { AskAI } from './AskAI';
+export { AskAIRAG } from './AskAIRAG';
 export { EditorHeader } from './EditorHeader';
 export { EditorPanel } from './EditorPanel';
 export { MarkdownComponents } from './MarkdownComponents';

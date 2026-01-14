@@ -27,6 +27,7 @@ export function Editor({ path }: Props) {
   const { data: session, status } = useSession();
   
   const [mdxContent, setMdxContent] = useState(HelperService.DEFAULT_CONTENT);
+  const [selectedText, setSelectedText] = useState('');
   const [isEditorFullscreen, setIsEditorFullscreen] = useState(false);
   const [isPreviewFullscreen, setIsPreviewFullscreen] = useState(false);
   const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
@@ -205,6 +206,9 @@ export function Editor({ path }: Props) {
         onTextareaScroll={onTextareaScroll}
         setMdxContent={setMdxContent}
         setLoading={setLoading}
+        selectedText={selectedText}
+        setSelectedText={setSelectedText}
+        path={path}
       />
       
       <PreviewPanel
