@@ -35,6 +35,7 @@ interface RepositoriesCardProps {
   onModeToggle: () => void;
   onSearchChange: (query: string) => void;
   onBackClick: () => void;
+  onRenameClick: (nodeName: string) => void;
   onFolderClick: (folderName: string) => void;
   onFileClick: (fileName: string) => void;
   onDeleteClick: (nodeName: string) => void;
@@ -58,6 +59,7 @@ export function RepositoriesCard({
   onModeToggle,
   onSearchChange,
   onBackClick,
+  onRenameClick,
   onFolderClick,
   onFileClick,
   onDeleteClick,
@@ -158,6 +160,7 @@ export function RepositoriesCard({
               isAdmin={isAdmin}
               disableSwitch={disableSwitch}
               pathname={pathname}
+              onRenameClick={onRenameClick}
               onFolderClick={onFolderClick}
               onFileClick={onFileClick}
               onDeleteClick={onDeleteClick}

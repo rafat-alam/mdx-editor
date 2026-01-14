@@ -26,7 +26,7 @@ import {
   InputOTPSlot,
 } from '@/components/ui/input-otp'
 import { AppDispatch, RootState } from '@/store/store'
-import { setForgotLoading2, setForgotToken } from '@/store/authSlice'
+import { setForgotLoading2, setForgotStep, setForgotToken } from '@/store/authSlice'
 
 const OTP_LENGTH = 6
 
@@ -46,6 +46,7 @@ export function ForgotPass2() {
   const authToken = useSelector((state: RootState) => state.auth.forgot_token)
   const isVerifying = useSelector((state: RootState) => state.auth.forgot_loading2)
   const [isResending, setIsResending] = useState(false)
+  const step = useSelector((state: RootState) => state.auth.forgot_step)
 
   const form = useForm<OTPFormData>({
     resolver: zodResolver(otpValidationSchema),
@@ -56,6 +57,10 @@ export function ForgotPass2() {
 
   useEffect(() => {
     dispatch(setForgotLoading2(false))
+    if (step != 2) {
+      dispatch(setForgotStep(1));
+      router.push('/signin')
+    }
   }, [pathname, dispatch])
 
   const handleSubmit = async (formData: OTPFormData) => {
@@ -69,6 +74,8 @@ export function ForgotPass2() {
 
       dispatch(setForgotToken(response.data.message))
       toast.success('OTP verified successfully!')
+      dispatch(setForgotToken(""));
+      dispatch(setForgotStep(3));
       router.push('/forgot-pass/change-pass')
     } catch (error: any) {
       if (axios.isAxiosError(error)) {

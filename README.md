@@ -40,9 +40,8 @@
 
 ### v1 🚀
 
-1. Update Forgot Password flow 🔐
-2. Finish the Editor ✍️
-3. Rename files, folders, and repositories 📝
+1. Finish the Editor ✍️
+2. Rename files, folders, and repositories 📝
 
 ### v2 🌱
 
@@ -104,6 +103,7 @@ src/
 │   ├── about
 │   ├── dashboard
 │   ├── editor
+│   ├── forgot-pass
 │   ├── home
 │   ├── nav-menu
 │   ├── public-repos

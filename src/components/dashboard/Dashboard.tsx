@@ -378,6 +378,10 @@ export function Dashboard({ path, m }: Props) {
             router.replace(`${newPath}?m=${m}`, { scroll: false });
           }
         }}
+        onRenameClick={(nodeName: string) => {
+          setNextChild(nodeName);
+          handleDeleteClick();
+        }}
         onFolderClick={(folderName: string) => {
           const newPath = [...pathname.split("/"), folderName].join("/");
           if(m == 0) {

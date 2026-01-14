@@ -25,7 +25,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp"
 import { AppDispatch, RootState } from "@/store/store"
-import { setSignUpLoading2, setSignUpToken } from "@/store/authSlice"
+import { setSignUpLoading2, setSignUpStep, setSignUpToken } from "@/store/authSlice"
 
 const OTP_LENGTH = 6
 
@@ -44,6 +44,7 @@ export function SignUpVerify() {
   const dispatch = useDispatch<AppDispatch>()
   const signup_token = useSelector((state: RootState) => state.auth.signup_token)
   const signup_loading2 = useSelector((state: RootState) => state.auth.signup_loading2)
+  const step = useSelector((state: RootState) => state.auth.signup_step)
 
   const otpForm = useForm<OtpFormValues>({
     resolver: zodResolver(otpFormSchema),
@@ -54,6 +55,10 @@ export function SignUpVerify() {
 
   useEffect(() => {
     dispatch(setSignUpLoading2(false))
+    if (step != 2) {
+      dispatch(setSignUpStep(1));
+      router.push('/signup')
+    }
   }, [])
 
   const handleOtpSubmit = async (formData: OtpFormValues) => {
@@ -67,6 +72,7 @@ export function SignUpVerify() {
 
       toast.success("Account created successfully!")
       dispatch(setSignUpToken(""))
+      dispatch(setSignUpStep(1));
       router.push('/signin')
     } catch (error: any) {
       if (axios.isAxiosError(error)) {

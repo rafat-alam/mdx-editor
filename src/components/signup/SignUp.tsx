@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui2/input"
 import { Label } from "@/components/ui/label"
 import { AppDispatch, RootState } from "@/store/store"
-import { setSignUpLoading1, setSignUpToken } from "@/store/authSlice"
+import { setSignUpLoading1, setSignUpStep, setSignUpToken } from "@/store/authSlice"
 import { HelperService } from "@/module/services/helper_service"
 
 const EMAIL_PATTERN = HelperService.email_regex.source
@@ -39,9 +39,14 @@ export function SignUp() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
   const signup_loading1 = useSelector((state: RootState) => state.auth.signup_loading1)
+  const step = useSelector((state: RootState) => state.auth.signup_step)
 
   useEffect(() => {
     dispatch(setSignUpLoading1(false))
+    if (step != 1) {
+      dispatch(setSignUpStep(1));
+      dispatch(setSignUpToken(""));
+    }
   }, [])
 
   const handleFormSubmit = async (event: React.FormEvent) => {
@@ -60,6 +65,7 @@ export function SignUp() {
 
       dispatch(setSignUpToken(response.data.message))
       toast.success("OTP sent successfully!")
+      dispatch(setSignUpStep(2));
       router.push('/signup/verify')
     } catch (error: any) {
       if (axios.isAxiosError(error)) {

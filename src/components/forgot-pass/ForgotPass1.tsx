@@ -27,7 +27,7 @@ import {
   CardTitle,
 } from '@/components/ui2/card'
 import { Input } from '@/components/ui2/input'
-import { setForgotLoading1, setForgotToken } from '@/store/authSlice'
+import { setForgotLoading1, setForgotStep, setForgotToken } from '@/store/authSlice'
 import { RootState } from '@/store/store'
 import { HelperService } from '@/module/services/helper_service'
 
@@ -42,6 +42,7 @@ export function ForgotPass1() {
   const dispatch = useDispatch()
   const pathname = usePathname()
   const isLoading = useSelector((state: RootState) => state.auth.forgot_loading1)
+  const step = useSelector((state: RootState) => state.auth.forgot_step)
 
   const form = useForm<EmailFormData>({
     resolver: zodResolver(emailValidationSchema),
@@ -52,6 +53,10 @@ export function ForgotPass1() {
 
   useEffect(() => {
     dispatch(setForgotLoading1(false))
+    if (step != 1) {
+      dispatch(setForgotStep(1));
+      router.push('/signin')
+    }
   }, [pathname, dispatch])
 
   const handleSubmit = async (formData: EmailFormData) => {
@@ -66,6 +71,7 @@ export function ForgotPass1() {
 
       dispatch(setForgotToken(response.data.message))
       toast('OTP sent successfully!')
+      dispatch(setForgotStep(2));
       router.push('/forgot-pass/verify')
     } catch (error: any) {
       if (axios.isAxiosError(error)) {

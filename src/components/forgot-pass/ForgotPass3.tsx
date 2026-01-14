@@ -28,7 +28,7 @@ import {
 } from '@/components/ui2/card'
 import { Input } from '@/components/ui2/input'
 import { AppDispatch, RootState } from '@/store/store'
-import { setForgotLoading3 } from '@/store/authSlice'
+import { setForgotLoading3, setForgotStep, setForgotToken } from '@/store/authSlice'
 import { HelperService } from '@/module/services/helper_service'
 
 const resetPasswordSchema = z
@@ -50,6 +50,7 @@ export function ForgotPass3() {
 
   const authToken = useSelector((state: RootState) => state.auth.forgot_token)
   const isResetting = useSelector((state: RootState) => state.auth.forgot_loading3)
+  const step = useSelector((state: RootState) => state.auth.forgot_step)
 
   const form = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
@@ -59,8 +60,13 @@ export function ForgotPass3() {
     },
   })
 
+  
   useEffect(() => {
     dispatch(setForgotLoading3(false))
+    if (step != 3) {
+      dispatch(setForgotStep(1));
+      router.push('/signin')
+    }
   }, [pathname, dispatch])
 
   const handleSubmit = async (formData: ResetPasswordFormData) => {
@@ -75,6 +81,8 @@ export function ForgotPass3() {
       })
 
       toast.success('Password changed successfully!')
+      dispatch(setForgotToken(""));
+      dispatch(setForgotStep(1));
       router.push('/signin')
     } catch (error: any) {
       if (axios.isAxiosError(error)) {

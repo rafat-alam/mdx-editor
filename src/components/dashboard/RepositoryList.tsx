@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui2/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Calendar, Globe, Lock, FileCode, Trash2 } from 'lucide-react';
+import { Calendar, Globe, Lock, FileCode, Trash2, Pencil } from 'lucide-react';
 
 interface _Node {
   node_name: string;
@@ -16,6 +16,7 @@ interface RepositoryListProps {
   isAdmin: boolean;
   disableSwitch: string;
   pathname: string;
+  onRenameClick: (nodeName: string) => void;
   onFolderClick: (folderName: string) => void;
   onFileClick: (fileName: string) => void;
   onDeleteClick: (nodeName: string) => void;
@@ -28,6 +29,7 @@ export function RepositoryList({
   isAdmin,
   disableSwitch,
   pathname,
+  onRenameClick,
   onFolderClick,
   onFileClick,
   onDeleteClick,
@@ -85,6 +87,18 @@ export function RepositoryList({
               </div>
             </div>}
             <div className="flex items-center gap-1">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-primary hover:bg-primary/10 hover:text-primary h-7 sm:h-9 w-7 sm:w-9 p-0 border border-input"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onRenameClick(repo.node_name);
+                }}
+                disabled={!isAdmin}
+              >
+                <Pencil className="h-3 w-3 sm:h-4 sm:w-4" />
+              </Button>
               { repo.node_type == 'FOLDER' && <Button
                 size="sm"
                 variant="ghost"
