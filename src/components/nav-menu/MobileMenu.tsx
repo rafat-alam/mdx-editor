@@ -3,9 +3,9 @@ import { useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { navigationMenuTriggerStyle } from '@/components/ui/navigation-menu'
-import { SignUpButton } from "./SignUpButton";
-import { SignInButton } from "./SignInButton";
-import { SignOutButton } from "./SignOutButton";
+import { SIB } from './SIB'
+import { SUB } from './sub'
+import { SOB } from './sob'
 
 interface MobileMenuProps {
   session: any
@@ -78,15 +78,15 @@ export function MobileMenu({ session }: MobileMenuProps) {
                   >
                     Dashboard - {session.user.username}
                   </a>
-                  <SignOutButton />
+                  <SOB />
                 </div>
               )}
 
               {/* Auth Buttons for non-logged in users */}
               {!session && (
                 <div className="flex flex-col space-y-2">
-                  <SignInButton />
-                  <SignUpButton />
+                  <SIB />
+                  <SUB />
                 </div>
               )}
             </div>

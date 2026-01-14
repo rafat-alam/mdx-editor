@@ -5,7 +5,7 @@ import { signOut } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
 
-export function SignOutButton() {
+export function SOB() {
   const [loading, setLoading] = useState(false);
 
   const handleLogout = () => {
