@@ -4,9 +4,9 @@ import {
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/authoptions"
 import { ThemeButton } from "./ThemeButton";
-// import { SignUpButton } from "./SignUpButton";
-// import { SignInButton } from "./SignInButton";
-// import { SignOutButton } from "./SignOutButton";
+import { SignUpButton } from "./SignUpButton";
+import { SignInButton } from "./SignInButton";
+import { SignOutButton } from "./SignOutButton";
 import { MobileMenu } from "./MobileMenu";
 
 export async function NavMenu() {
@@ -49,14 +49,14 @@ export async function NavMenu() {
       {/* Right group */}
       <div className="hidden min-[640px]:flex items-center space-x-3">
         <ThemeButton />
-        {/* {!session && <SignUpButton />}
+        {!session && <SignUpButton />}
         {!session && <SignInButton />}
         {session && (
           <a href={`/u/${session.user.username}`} className="hover:underline">
             <b>{session.user.username}</b>
           </a>
         )}
-        {session && <SignOutButton />} */}
+        {session && <SignOutButton />}
       </div>
 
       {/* Mobile */}
