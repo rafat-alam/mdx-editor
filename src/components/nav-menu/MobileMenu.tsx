@@ -4,8 +4,8 @@ import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { navigationMenuTriggerStyle } from '@/components/ui/navigation-menu'
 import { SIB } from './SIB'
-import { SUB } from './sub'
-import { SOB } from './sob'
+import { SUB } from './SUB'
+import { SOB } from './SOB'
 
 interface MobileMenuProps {
   session: any
