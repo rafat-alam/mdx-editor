@@ -7,6 +7,12 @@ interface Response {
   message: string;
 }
 
+interface ResponseRepo {
+  status: number;
+  message: string;
+  list: null | any;
+}
+
 interface ResponseList {
   status: number;
   message: string;
@@ -293,6 +299,63 @@ export class NodeService {
     try {
       const repo_list = await NodeRepo.get_all_public_repos();
       return { status: 200, message: SUCCESS, list: repo_list };
+    } catch {
+      return { status: 500, message: INTERNAL_SERVER_ERROR, list: null };
+    }
+  }
+
+  private static async get_node_list(node_id: string) {
+    const li: _Node [] = await NodeRepo.get_list(node_id);
+
+    let res: any = [];
+
+    for(const l of li) {
+      let list: any = {
+        _id: l.node_id,
+        name: l.node_name,
+        checked: 0,
+        isOpen: false,
+        node_type: l.node_type,
+        is_public: l.is_public,
+        content: l.content,
+        owner_id: l.owner_id,
+        parent_id: l.parent_id,
+        last_updated: l.last_updated,
+        children: await this.get_node_list(l.node_id),
+      };
+
+      res.push(list);
+    }
+
+    return res;
+  }
+
+  private static async get_repo(node_id: string, user_id: string): Promise<ResponseRepo> {
+    try {
+      if(await NodeRepo.is_repo_not_present(node_id)) {
+        return { status: 404, message: PAGE_NOT_FOUND, list: null };
+      }
+
+      let res: _Node = await NodeRepo.get_node(node_id);
+
+      if(res.is_public == false && res.owner_id != user_id) {
+        return { status: 500, message: INTERNAL_SERVER_ERROR, list: null };
+      }
+
+      return { status: 200, message: SUCCESS, list: {
+          _id: res.node_id,
+          name: res.node_name,
+          checked: 0,
+          isOpen: false,
+          node_type: res.node_type,
+          is_public: res.is_public,
+          content: res.content,
+          owner_id: res.owner_id,
+          parent_id: res.parent_id,
+          last_updated: res.last_updated,
+          children: await this.get_node_list(res.node_id),
+        }
+      };
     } catch {
       return { status: 500, message: INTERNAL_SERVER_ERROR, list: null };
     }

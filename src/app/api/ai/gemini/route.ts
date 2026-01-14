@@ -5,11 +5,15 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(req: NextRequest) {
   try {
-    const { content, query, model } = await req.json();
+    let { content, query, model } = await req.json();
 
     if (typeof content !== "string" || typeof query !== "string" || typeof model !== "string") {
       return NextResponse.json({ message: 'Bad Request!' }, { status: 400 });
     }
+
+    content = content.trim();
+    query = query.trim();
+    model = model.trim();
 
     if (model !== 'gemini-2.0-flash-lite' && model !== 'gemini-2.0-flash'
         && model !== 'gemini-2.5-flash-lite' && model !== 'gemini-2.5-flash'

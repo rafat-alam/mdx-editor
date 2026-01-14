@@ -4,8 +4,8 @@ export default async function UserPage({
   params,
   searchParams,
 }: {
-  params: { path: string[] };
-  searchParams: { m?: string };
+  params: Promise<{ path: string[] }>;
+  searchParams: Promise<{ m?: string }>;
 }) {
   const { path } = await params;
 
