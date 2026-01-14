@@ -6,8 +6,8 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/authoptions"
 import { ThemeButton } from "./ThemeButton";
 import { MobileMenu } from "./MobileMenu";
 import { SIB } from './SIB'
-import { SUB } from "./sub";
-import { SOB } from "./sob";
+import { SUB } from "./SUB";
+import { SOB } from "./SOB";
 
 export async function NavMenu() {
   const session = await getServerSession(authOptions);
