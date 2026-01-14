@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 
-export function SUB() {
+export function SignUpButton() {
   return (
     <div className="flex flex-wrap items-center md:flex-row">
       <a href="/signup">
