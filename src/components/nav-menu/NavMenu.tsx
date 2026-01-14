@@ -3,11 +3,11 @@ import {
 } from "@/components/ui/navigation-menu"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/authoptions"
-// import { ThemeButton } from "./ThemeButton";
+import { ThemeButton } from "./ThemeButton";
 // import { SignUpButton } from "./SignUpButton";
 // import { SignInButton } from "./SignInButton";
 // import { SignOutButton } from "./SignOutButton";
-// import { MobileMenu } from "./MobileMenu";
+import { MobileMenu } from "./MobileMenu";
 
 export async function NavMenu() {
   const session = await getServerSession(authOptions);
@@ -47,23 +47,23 @@ export async function NavMenu() {
       </div>
 
       {/* Right group */}
-      {/* <div className="hidden min-[640px]:flex items-center space-x-3">
+      <div className="hidden min-[640px]:flex items-center space-x-3">
         <ThemeButton />
-        {!session && <SignUpButton />}
+        {/* {!session && <SignUpButton />}
         {!session && <SignInButton />}
         {session && (
           <a href={`/u/${session.user.username}`} className="hover:underline">
             <b>{session.user.username}</b>
           </a>
         )}
-        {session && <SignOutButton />}
-      </div> */}
+        {session && <SignOutButton />} */}
+      </div>
 
       {/* Mobile */}
-      {/* <div className="flex min-[640px]:hidden items-center space-x-2">
+      <div className="flex min-[640px]:hidden items-center space-x-2">
         <ThemeButton />
         <MobileMenu session={session} />
-      </div> */}
+      </div>
     </nav>
   )
 }
