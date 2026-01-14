@@ -82,12 +82,14 @@ src/
 │   │   │   ├── add-file              (route)
 │   │   │   ├── add-folder            (route)
 │   │   │   ├── add-repo              (route)
-│   │   │   ├── get-all-public-repos  (route)
-│   │   │   ├── get-path              (route)
 │   │   │   ├── remove                (route)
 │   │   │   ├── rename                (route)
 │   │   │   ├── save                  (route)
 │   │   │   └── set-repo-vis          (route)
+│   │   │
+│   │   ├── get
+│   │   │   ├── all-public-repos      (route)
+│   │   │   └── path                  (route)
 │   │   │
 │   │   └── u/[username]              (route)
 │   │
@@ -132,9 +134,11 @@ src/
 │       ├── node_service.ts
 │       └── user_service.ts
 │
-└── store/              (Redux Toolkit)
-    ├── authSlice.ts
-    └── store.ts
+├── store/              (Redux Toolkit)
+│   ├── authSlice.ts
+│   └── store.ts
+│
+└── middleware.ts       (Edge Runtime)
 
 types/
 └── next-auth.d.ts

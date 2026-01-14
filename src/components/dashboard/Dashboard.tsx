@@ -112,7 +112,7 @@ export function Dashboard({ path, m }: Props) {
     setIsContentArrived(false);
     
     try {
-      const res: AxiosResponse1 = await axios.post('/api/edit/get-path', { path });
+      const res: AxiosResponse1 = await axios.post('/api/get/path', { path });
 
       if(res.data.list == null) {
         router.replace('/');

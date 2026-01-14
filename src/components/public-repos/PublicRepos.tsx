@@ -32,7 +32,7 @@ export function PublicRepos() {
     setNodes(undefined);
     
     try {
-      const res: AxiosResponse1 = await axios.get('/api/edit/get-all-public-repo');
+      const res: AxiosResponse1 = await axios.get('/api/get/all-public-repos');
 
       if (res.data.list == null) {
         router.replace('/');

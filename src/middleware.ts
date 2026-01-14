@@ -9,24 +9,16 @@ export async function middleware(req: NextRequest) {
 
   const protectedPaths1 = [
     '/api/ai',
-    '/api/auth/change-email',
-    '/api/auth/last-active',
-    '/api/auth/me',
-    '/api/edit/add-file',
-    '/api/edit/add-folder',
-    '/api/edit/add-repo',
-    '/api/edit/remove',
-    '/api/edit/rename',
-    '/api/edit/rename-repo',
-    '/api/edit/save',
-    '/api/edit/set-repo-vis',
+    '/api/edit/',
+    '/settings'
   ];
 
   const protectedPaths2 = [
-    '/api/auth/forgot-pass',
-    '/api/auth/resend-otp',
-    '/api/auth/signup',
-    '/api/auth/verify-otp',
+    '/api/auth/forgot-pass/',
+    '/api/auth/signup/',
+    '/signin',
+    '/signup',
+    '/forgot-pass',
   ];
 
   const needs_auth = protectedPaths1.some((path) => pathname.startsWith(path));
@@ -49,7 +41,10 @@ export async function middleware(req: NextRequest) {
     const data = await redis_res.json();
 
     if (!data.result || data.result !== token.session_id) {
-      const res = NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
+      let res = NextResponse.redirect(new URL('/signin', req.url));
+      if(pathname.startsWith('/api')) {
+        res = NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
+      }
       res.cookies.delete("next-auth.session-token");
       res.cookies.delete("__Secure-next-auth.session-token");
       res.cookies.delete("next-auth.csrf-token");
@@ -59,11 +54,17 @@ export async function middleware(req: NextRequest) {
   }
 
   if (needs_auth && !token) {
-    return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
+    if(pathname.startsWith('/api')) {
+      return NextResponse.json({ message: "Unauthorized!" }, { status: 401 });
+    }
+    return NextResponse.redirect(new URL('/signin', req.url));
   }
 
   if (guest_only && token) {
-    return NextResponse.json({ message: "Access Forbidden!" }, { status: 403 });
+    if(pathname.startsWith('/api')) {
+      return NextResponse.json({ message: "Access Forbidden!" }, { status: 403 });
+    }
+    return NextResponse.redirect(new URL('/', req.url));
   }
 
   return NextResponse.next();
@@ -74,9 +75,10 @@ export const config = {
     '/api/:path*',
     '/',
     '/about',
-    '/editor',
+    '/editor/:path*',
     '/forgot-pass',
-    '/r/:path*',
+    '/public-repos',
+    '/settings',
     '/signin',
     '/signup',
     '/u/:path*'

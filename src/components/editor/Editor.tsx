@@ -68,7 +68,7 @@ export function Editor({ path }: Props) {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const res: AxiosResponse = await axios.post('/api/edit/get-path', { path });
+        const res: AxiosResponse = await axios.post('/api/get/path', { path });
 
         if (res.data.list == null) {
           setMdxContent(res.data.message);
