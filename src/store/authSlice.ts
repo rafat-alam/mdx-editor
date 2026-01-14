@@ -1,73 +1,73 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 interface TokenState {
-  token: string,
-  loading: boolean, // signup
-  loading2: boolean, // signup
-  loading3: boolean, // signin
-  forgottoken: string,
-  forgottoken2: string,
-  loading4: boolean, // forgot
-  loading5: boolean, // forgot
-  loading6: boolean, // forgot
+  signup_token: string,     // signup
+  signup_loading1: boolean, // signup
+  signup_loading2: boolean, // signup
+  signup_step: number,      // signup
+  forgot_token: string,     // forgot
+  forgot_loading1: boolean, // forgot
+  forgot_loading2: boolean, // forgot
+  forgot_loading3: boolean, // forgot
+  forgot_step: number,      // forgot
 }
 
 const initialState: TokenState = {
-  token: "",
-  loading: false,
-  loading2: false,
-  loading3: false,
-  forgottoken: "",
-  forgottoken2: "",
-  loading4: false,
-  loading5: false,
-  loading6: false,
+  signup_token: "",
+  signup_loading1: false,
+  signup_loading2: false,
+  signup_step: 1,
+  forgot_token: "",
+  forgot_loading1: false,
+  forgot_loading2: false,
+  forgot_loading3: false,
+  forgot_step: 1,
 }
 
 const authSlice = createSlice({
   name: 'signup',
   initialState,
   reducers: {
-    setToken: (state, action: PayloadAction<string>) => {
-      state.token = action.payload
+    setSignUpToken: (state, action: PayloadAction<string>) => {
+      state.signup_token = action.payload
     },
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.loading = action.payload
+    setSignUpLoading1: (state, action: PayloadAction<boolean>) => {
+      state.signup_loading1 = action.payload
     },
-    setLoading2: (state, action: PayloadAction<boolean>) => {
-      state.loading2 = action.payload
+    setSignUpLoading2: (state, action: PayloadAction<boolean>) => {
+      state.signup_loading2 = action.payload
     },
-    setLoading3: (state, action: PayloadAction<boolean>) => {
-      state.loading3 = action.payload
+    setSignUpStep: (state, action: PayloadAction<number>) => {
+      state.signup_step = action.payload
     },
     setForgotToken: (state, action: PayloadAction<string>) => {
-      state.forgottoken = action.payload
+      state.forgot_token = action.payload
     },
-    setForgotToken2: (state, action: PayloadAction<string>) => {
-      state.forgottoken2 = action.payload
+    setForgotLoading1: (state, action: PayloadAction<boolean>) => {
+      state.forgot_loading1 = action.payload
     },
-    setLoading4: (state, action: PayloadAction<boolean>) => {
-      state.loading4 = action.payload
+    setForgotLoading2: (state, action: PayloadAction<boolean>) => {
+      state.forgot_loading2 = action.payload
     },
-    setLoading5: (state, action: PayloadAction<boolean>) => {
-      state.loading5 = action.payload
+    setForgotLoading3: (state, action: PayloadAction<boolean>) => {
+      state.forgot_loading3 = action.payload
     },
-    setLoading6: (state, action: PayloadAction<boolean>) => {
-      state.loading6 = action.payload
+    setForgotStep: (state, action: PayloadAction<number>) => {
+      state.forgot_step = action.payload
     },
   },
 })
 
 export const {
-  setToken,
-  setLoading,
-  setLoading2,
-  setLoading3,
+  setSignUpToken,
+  setSignUpLoading1,
+  setSignUpLoading2,
+  setSignUpStep,
   setForgotToken,
-  setForgotToken2,
-  setLoading4,
-  setLoading5,
-  setLoading6
+  setForgotLoading1,
+  setForgotLoading2,
+  setForgotLoading3,
+  setForgotStep,
 } = authSlice.actions
 
 export default authSlice.reducer

@@ -1,10 +1,5 @@
-import { AboutPage } from '@/components/about-page'
-import React from 'react'
+import { About } from "@/components/about";
 
-export default function About() {
-  return (
-    <>
-      <AboutPage />
-    </>
-  )
+export default function Page() {
+  return <About />;
 }

@@ -1,78 +1,133 @@
 import CredentialsProvider from "next-auth/providers/credentials";
-import { db } from "root/db";
-import { users } from "root/db/schema";
-import { ilike } from "drizzle-orm";
-import bcrypt from "bcryptjs";
+import { getDB } from "root/db";
+import { user } from "root/db/schema";
+import { eq, or } from "drizzle-orm";
 import { AuthOptions } from "next-auth";
+import { HelperService } from "@/module/services/helper_service";
+import type { User } from "next-auth";
+import { v4 } from "uuid";
+import { UserService } from "@/module/services/user_service";
 
 export const authOptions: AuthOptions = {
-  secret: process.env.NEXTAUTH_SECRET,
-  session: { strategy: "jwt" },
+  secret: process.env.NEXTAUTH_SECRET ?? 'rafat',
+  session: {
+    strategy: "jwt",
+    maxAge: 604800,
+  },
+  jwt: {
+    maxAge: 604800,
+  },
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email_username: { label: "Email-Username", type: "text" },
-        password: { label: "Password", type: "password" },
+        identifier: { label: "identifier", type: "text" },
+        password: { label: "password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials): Promise<User | null> {
         if (!credentials) return null;
 
-        // Fetch user from Postgres
-        const [user1] = await db
-          .select()
-          .from(users)
-          .where(ilike(users.email, credentials.email_username.trim().toLowerCase()));
+        const db = await getDB();
+        const identifier = credentials.identifier.trim().toLowerCase();
 
-        const [user2] = await db
-          .select()
-          .from(users)
-          .where(ilike(users.username, credentials.email_username.trim().toLowerCase()));
-
-        if (!user1 && !user2) throw new Error("Invalid credentials");
-
-        if(user1) {
-          // Verify password
-          const isValid = await bcrypt.compare(credentials.password, user1.password);
-          if (!isValid) throw new Error("Invalid credentials");
-
-          // Return user info for JWT/session
-          return {
-            id: user1.id.toString(),
-            email: user1.email,
-            username: user1.username,
-          };
-        } else {
-          // Verify password
-          const isValid = await bcrypt.compare(credentials.password, user2.password);
-          if (!isValid) throw new Error("Invalid credentials");
-
-          // Return user info for JWT/session
-          return {
-            id: user2.id.toString(),
-            email: user2.email,
-            username: user2.username,
-          };
+        let db_user;
+        try {
+          const res = await db.select().from(user).where(or(eq(user.email, identifier), eq(user.username, identifier)));
+          db_user = res[0]
+        } catch {
+          throw new Error("INTERNAL SERVER ERROR!");
         }
+
+        if (!db_user) throw new Error("Invalid credentials!");
+
+        const is_valid = HelperService.verify(credentials.password, db_user.password_hash);
+
+        if (!is_valid) throw new Error("Invalid credentials!");
+
+        const session_id = v4();
+
+        try {
+          await fetch(
+            `${process.env.UPSTASH_REDIS_REST_URL}/set/session:${db_user.user_id}/${session_id}?ex=604800`, {
+            headers: {
+              Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
+            },
+          });
+
+          await fetch(
+            `${process.env.UPSTASH_REDIS_REST_URL}/set/last-active:${db_user.user_id}/${Date.now()}`, {
+            headers: {
+              Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
+            },
+          });
+        } catch {
+          throw new Error("INTERNAL SERVER ERROR!");
+        }
+
+        return {
+          id: db_user.user_id,
+          user_id: db_user.user_id,
+          username: db_user.username,
+          name: db_user.name,
+          email: db_user.email,
+          session_id: session_id,
+        };
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.email = user.email;
+        token.user_id = user.user_id;
         token.username = user.username;
+        token.name = user.name;
+        token.email = user.email;
+        token.session_id = user.session_id;
+        return token;
       }
+
+      const res = await UserService.get_user_by_id(token.user_id);
+
+      if (res.status != 200) return token;
+
+      const db_user = res.user!;
+
+      token.user_id = token.user_id;
+      token.username = db_user.username;
+      token.name = db_user.name;
+      token.email = db_user.email;
+      token.session_id = token.session_id;
+
       return token;
     },
+
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.email = token.email as string;
-        session.user.username = token.username as string;
-      }
+      session.user = {
+        user_id: token.user_id,
+        username: token.username,
+        name: token.name,
+        email: token.email,
+        session_id: token.session_id,
+      };
       return session;
+    },
+  },
+  events: {
+    async signOut({ token }) {
+      console.log(token);
+      if (!token?.user_id || !token?.session_id) return;
+
+      try {
+        await fetch(
+          `${process.env.UPSTASH_REDIS_REST_URL}/del/session:${token.user_id}/${token.session_id}`, {
+            headers: {
+              Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
+            },
+          }
+        );
+      } catch {
+        throw new Error("INTERNAL SERVER ERROR!");
+      }
     },
   },
   pages: {

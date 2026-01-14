@@ -1,50 +1,37 @@
+import { AuthService } from "@/module/services/auth_service";
+import { HelperService } from "@/module/services/helper_service";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
-import { db } from "root/db";
-import { users } from "root/db/schema";
-import { eq } from "drizzle-orm";
 
-interface ResetToken {
-  email: string;
-  canReset: boolean;
+interface Response {
+  status: number;
+  message: string;
 }
 
 export async function POST(req: NextRequest) {
-  const { token, newPassword } = await req.json();
-  if (!token || !newPassword) {
-    return NextResponse.json({ message: "Missing token or password" }, { status: 400 });
-  }
-
-  const secret = process.env.NEXTAUTH_SECRET!;
-  let decoded: ResetToken;
   try {
-    decoded = jwt.verify(token, secret) as ResetToken;
+    let { token, password } = await req.json();
+
+    if (typeof token !== "string" || typeof password !== "string") {
+      return NextResponse.json({ message: 'Bad Request!' }, { status: 400 });
+    }
+
+    token = token.trim();
+    password = password.trim();
+
+    const res1: Response = HelperService.check_password(password);
+    
+    if (res1.status != 200) {
+      return NextResponse.json({ message: res1.message }, { status: res1.status });
+    }
+    
+    if (!token) {
+      return NextResponse.json({ message: 'Invalid or expired token!' }, { status: 401 });
+    }
+
+    const res2: Response = await AuthService.set_password(token, password);
+
+    return NextResponse.json({ message: res2.message }, { status: res2.status });
   } catch {
-    return NextResponse.json({ message: "Invalid or expired token" }, { status: 400 });
+    return NextResponse.json({ message: 'INTERNAL SERVER ERROR!' }, { status: 500 });
   }
-
-  if (!decoded.canReset) {
-    return NextResponse.json({ message: "OTP not verified" }, { status: 403 });
-  }
-
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
-
-  if (!passwordRegex.test(newPassword)) {
-    return NextResponse.json({ message: 'Password is not in valid format' }, { status: 400 });
-  }
-
-  // Hash and update password
-  const hashed = await bcrypt.hash(newPassword, 10);
-  const updated = await db
-    .update(users)
-    .set({ password: hashed })
-    .where(eq(users.email, decoded.email))
-    .returning({ email: users.email });
-
-  if (!updated.length) {
-    return NextResponse.json({ message: "User not found" }, { status: 404 });
-  }
-
-  return NextResponse.json({ message: "Password updated successfully" }, { status: 200 });
 }
