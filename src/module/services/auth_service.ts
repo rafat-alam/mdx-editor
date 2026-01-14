@@ -4,6 +4,7 @@ import { v4 } from "uuid";
 import { User } from "../entities/user";
 import { UserRepo } from "../repo/user_repo";
 import { HelperService } from "./helper_service";
+import { send_email } from "root/helpers/mailer";
 
 interface Response {
   status: number;
@@ -42,9 +43,12 @@ export class AuthService {
     return randomInt(100000, 999999).toString();
   }
 
-  private static send_otp(otp: string): void {
-    // TODO: Implement actual OTP sending (email/sms)
-    console.log(otp);
+  private static async send_otp(email: string, otp: string): Promise<void> {
+    await send_email(email, `MDX Editor OTP : ${otp}`,
+      `MDX Editor OTP : <b>${otp}</b>
+      <br />
+      Valid for only 10 mins.`
+    );
   }
 
   private static create_token(payload: any, expiry: string): string {
@@ -77,7 +81,7 @@ export class AuthService {
       const otp = this.generate_otp();
       const otp_expiry = Date.now() + OTP_EXPIRY_DURATION;
 
-      this.send_otp(otp);
+      await this.send_otp(email, otp);
 
       const payload: DecodedToken = { temp_user, otp, otp_expiry };
       const token = this.create_token(payload, SIGNUP_TOKEN_EXPIRY);
@@ -103,7 +107,7 @@ export class AuthService {
       const otp = this.generate_otp();
       const otp_expiry = Date.now() + OTP_EXPIRY_DURATION;
 
-      this.send_otp(otp);
+      await this.send_otp(decoded.temp_user.email, otp);
 
       const payload: DecodedToken = { temp_user: decoded.temp_user, otp, otp_expiry };
       const new_token = this.create_token(payload, SIGNUP_TOKEN_EXPIRY);
@@ -154,7 +158,7 @@ export class AuthService {
       const otp = this.generate_otp();
       const otp_expiry = Date.now() + OTP_EXPIRY_DURATION;
 
-      this.send_otp(otp);
+      await this.send_otp(email, otp);
 
       const payload: ResetToken = { email, otp, otp_expiry, can_reset: false };
       const token = this.create_token(payload, SIGNUP_TOKEN_EXPIRY);
@@ -180,7 +184,7 @@ export class AuthService {
       const otp = this.generate_otp();
       const otp_expiry = Date.now() + OTP_EXPIRY_DURATION;
 
-      this.send_otp(otp);
+      await this.send_otp(decoded.email, otp);
 
       const payload: ResetToken = { email: decoded.email, otp, otp_expiry, can_reset: false };
       const new_token = this.create_token(payload, SIGNUP_TOKEN_EXPIRY);
