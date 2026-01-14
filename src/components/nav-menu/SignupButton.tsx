@@ -1,8 +1,6 @@
-"use client"
-
 import { Button } from "@/components/ui/button";
 
-export function SignUpButton() {
+export async function SignUpButton() {
   return (
     <div className="flex flex-wrap items-center md:flex-row">
       <a href="/signup">
