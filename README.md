@@ -42,8 +42,7 @@
 
 1. Update Forgot Password flow 🔐
 2. Finish the Editor ✍️
-3. Add Middleware Proxy 🧩
-4. Rename files, folders, and repositories 📝
+3. Rename files, folders, and repositories 📝
 
 ### v2 🌱
 
@@ -52,6 +51,7 @@
 3. Change username 🆔
 4. Change email 📧
 5. Change password 🔒
+6. Middleware to Proxy 🧩
 
 ## Project Structure 🗂️
 
