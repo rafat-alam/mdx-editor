@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 });
 
 
-export const sendEmail = async (to: string, subject: string, html: string) => {
+export const send_email = async (to: string, subject: string, html: string) => {
   await transporter.sendMail({
     from: '"MDX Editor OTP" <rafat.alam.ra@gmail.com>',
     to,

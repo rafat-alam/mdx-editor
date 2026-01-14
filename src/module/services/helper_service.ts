@@ -1,6 +1,7 @@
 import { randomBytes, scryptSync } from "crypto";
 import { getToken } from "next-auth/jwt";
 import { NextRequest } from "next/server";
+import nodemailer from 'nodemailer';
 
 interface Response {
   message: string;
