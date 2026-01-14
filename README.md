@@ -50,6 +50,7 @@
 4. Change email 📧
 5. Change password 🔒
 6. Middleware to Proxy 🧩
+7. OAuth SignIn / SignUp 🔑
 
 ## Project Structure 🗂️
 
