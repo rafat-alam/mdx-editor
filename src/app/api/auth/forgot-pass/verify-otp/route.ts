@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Invalid or expired token!' }, { status: 401 });
     }
 
-    const res2: Response = await AuthService.verify_reset_otp(token, otp);
+    const res2: Response = await AuthService.forgot_pass_verify_otp(token, otp);
 
     return NextResponse.json({ message: res2.message }, { status: res2.status });
   } catch {

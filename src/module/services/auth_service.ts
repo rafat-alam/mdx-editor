@@ -165,7 +165,7 @@ export class AuthService {
     }
   }
 
-  static async resend_reset_otp(token: string): Promise<Response> {
+  static async forgot_pass_resend_otp(token: string): Promise<Response> {
     try {
       const decoded = this.verify_token<ResetToken>(token);
       if (!decoded) {
@@ -191,7 +191,7 @@ export class AuthService {
     }
   }
 
-  static async verify_reset_otp(token: string, otp: string): Promise<Response> {
+  static async forgot_pass_verify_otp(token: string, otp: string): Promise<Response> {
     try {
       const decoded = this.verify_token<ResetToken>(token);
       if (!decoded) {
@@ -234,49 +234,6 @@ export class AuthService {
       await UserRepo.update_password(decoded.email, password_hash);
 
       return { status: 200, message: 'Password updated successfully!' };
-    } catch {
-      return { status: 500, message: INTERNAL_SERVER_ERROR };
-    }
-  }
-
-  static async init_change_email(email: string): Promise<Response> {
-    try {
-      if (await UserRepo.find_by_email(email)) {
-        return { status: 400, message: 'E-Mail already used!' };
-      }
-
-      const otp = this.generate_otp();
-      const otp_expiry = Date.now() + OTP_EXPIRY_DURATION;
-
-      this.send_otp(otp);
-
-      const payload: ResetToken = { email, otp, otp_expiry, can_reset: false };
-      const token = this.create_token(payload, SIGNUP_TOKEN_EXPIRY);
-
-      return { status: 200, message: token };
-    } catch {
-      return { status: 500, message: INTERNAL_SERVER_ERROR };
-    }
-  }
-
-  static async set_email(token: string, user_id: string): Promise<Response> {
-    try {
-      const decoded = this.verify_token<VerifiedResetToken>(token);
-      if (!decoded) {
-        return { status: 401, message: 'Invalid or expired token!' };
-      }
-
-      if (!decoded.can_reset) {
-        return { status: 401, message: 'OTP not verified' };
-      }
-
-      if (await UserRepo.find_by_email(decoded.email)) {
-        return { status: 401, message: 'E-Mail already used!' };
-      }
-
-      await UserRepo.update_email(user_id, decoded.email);
-
-      return { status: 200, message: 'E-Mail updated successfully!' };
     } catch {
       return { status: 500, message: INTERNAL_SERVER_ERROR };
     }

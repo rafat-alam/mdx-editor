@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Invalid or expired token!' }, { status: 401 });
     }
 
-    const res: Response = await AuthService.resend_reset_otp(token);
+    const res: Response = await AuthService.forgot_pass_resend_otp(token);
 
     return NextResponse.json({ message: res.message }, { status: res.status });
   } catch {
