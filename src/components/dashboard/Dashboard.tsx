@@ -227,9 +227,7 @@ export function Dashboard({ path, m }: Props) {
     try {
       await axios.post('/api/edit/add-repo', { name: repoName });
 
-      if(user && user.repo_count) {
-        user.repo_count++;
-      }
+      if(user) user.repo_count++;
       toast.success("Repo Added!")
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
