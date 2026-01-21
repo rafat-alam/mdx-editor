@@ -25,8 +25,6 @@ export async function POST(req: NextRequest) {
 
     const token = await getToken({ req, secret });
 
-    name = name.trim() + ".mdx";
-
     const res1: Response = await HelperService.check_auth(req);
     
     if(res1.status != 200 || !token) {
@@ -38,6 +36,8 @@ export async function POST(req: NextRequest) {
     if(res2.status != 200) {
       return NextResponse.json({ message: res2.message }, { status: res2.status });
     }
+    
+    name = name.trim() + ".mdx";
 
     if(path.length < 2) {
       return NextResponse.json({ message: 'Access Forbidden!' }, { status: 403 });
